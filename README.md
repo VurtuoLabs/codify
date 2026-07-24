@@ -232,15 +232,26 @@ codify/
 
 ## Status and known environment notes
 
-All metadata in this repo was **deploy-verified** against a live Enterprise org: 17/17 Apex classes, 5/5 flows, 5/5 LWCs, all objects and fields, tabs, flexipages, app, permission sets, the messaging channel, the queue and the agent bundle all deploy cleanly.
+Codify is **deployed and green** in `test-81e-dev-ed.develop.my.salesforce.com`:
 
-Three things could not be fully verified in that org, and are worth knowing before you rely on them:
+| Check                 | Result                                                                                                                                                                               |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Metadata deploy       | All components clean — 17 Apex classes, 5 flows, 5 LWCs, 56 object components, 14 taxonomy rows, tabs, flexipages, app, both permission sets, messaging channel, queue, agent bundle |
+| Apex tests            | **46/46 pass**, 94% coverage across the Codify classes (85–100% per class)                                                                                                           |
+| End-to-end smoke test | One recap produced a tagged Case, a Knowledge **Draft**, a suggestion on a sibling Case, and 5 audit rows — one per action                                                           |
 
-1. **Apex tests — 26 of 46 pass there.** All 20 failures share one cause outside Codify: that org's `SDO Service - Case - On Create` record-triggered flow fails in test context (`Missing required input parameter: helperConfig`), which blocks every `insert` of a `Case`. A bare `insert new Case(...)` outside a test succeeds in the same org, confirming it is environmental. Every test that does not insert a Case passes, including the full extraction and classification suite. The clean dev orgs available did not have Knowledge enabled, so they could not be used as an alternative.
-2. **Custom metadata records do not deploy to that org** (`UNKNOWN_EXCEPTION`). Scribe's known-good taxonomy records fail identically there, so this is an org limitation rather than a defect in the records.
-3. **`sf agent validate authoring-bundle` returns 422** in that org for `Codify_Agent` — and equally for Scribe's known-good bundle, so the Agent Script compile endpoint is unavailable there rather than the script being invalid. The bundle itself deploys.
+The smoke-test records were removed afterwards, so the org holds the app and the taxonomy but no sample data.
 
-The `<site>` value in `Codify_Embedded.EmbeddedServiceConfig-meta.xml` is a **placeholder**. Embedded messaging deployments each need their own ESW site, which only Setup can create and which cannot be shared between deployments; replace it before deploying that file. See [`experience-site/README.md`](experience-site/README.md).
+### Things worth knowing
+
+**Two bugs that only a real deploy would have caught**, both now fixed in this repo:
+
+1. **Custom metadata records need `xmlns:xsd` declared.** The files use `xsi:type="xsd:string"` on every value. With the `xsd` prefix undeclared the Metadata API rejects the whole deploy with a bare `UNKNOWN_EXCEPTION` and no component detail — a record with _no_ values validates fine, which is what makes it hard to spot. Note that [Scribe](../scribe) has the same latent issue in its `Scribe_Stage_Requirement` records.
+2. **Prettier corrupts `<flow>` elements.** `prettier-plugin-xml` hands the content of a `<flow>` tag to its JavaScript-Flow parser, which appends a stray `;` and reflows the value, silently breaking `flowAccesses` in permission sets. `**/permissionsets/**` is therefore excluded in `.prettierignore` and those files are formatted by hand.
+
+**Still requires Setup, and cannot be source-controlled.** The `<site>` value in `Codify_Embedded.EmbeddedServiceConfig-meta.xml` is a **placeholder**. Every embedded messaging deployment needs its own ESW site, which only Setup can create and which cannot be shared between deployments. The messaging channel and queue deploy fine; the deployment config needs that one value swapped first. See [`experience-site/README.md`](experience-site/README.md).
+
+**`sf agent validate authoring-bundle` returns 422** in the Enterprise org it was tried in — equally for Scribe's known-good bundle, so the Agent Script compile endpoint is unavailable there rather than the script being invalid. The bundle deploys and publishes normally.
 
 ## License
 

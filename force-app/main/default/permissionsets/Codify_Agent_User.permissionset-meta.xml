@@ -28,21 +28,26 @@
     >Codify_EscalateForReviewInvocable</apexClass><enabled
     >true</enabled></classAccesses>
 
-    <flowAccesses><flow>
-Codify_Log_Resolution;
-    </flow><enabled>true</enabled></flowAccesses>
-    <flowAccesses><flow>
-Codify_Tag_Root_Cause;
-    </flow><enabled>true</enabled></flowAccesses>
-    <flowAccesses><flow>
-Codify_Draft_Knowledge_Article;
-    </flow><enabled>true</enabled></flowAccesses>
-    <flowAccesses><flow>
-Codify_Related_Case_Sweep;
-    </flow><enabled>true</enabled></flowAccesses>
-    <flowAccesses><flow>
-Codify_Escalate_For_Review;
-    </flow><enabled>true</enabled></flowAccesses>
+    <flowAccesses>
+        <flow>Codify_Log_Resolution</flow>
+        <enabled>true</enabled>
+    </flowAccesses>
+    <flowAccesses>
+        <flow>Codify_Tag_Root_Cause</flow>
+        <enabled>true</enabled>
+    </flowAccesses>
+    <flowAccesses>
+        <flow>Codify_Draft_Knowledge_Article</flow>
+        <enabled>true</enabled>
+    </flowAccesses>
+    <flowAccesses>
+        <flow>Codify_Related_Case_Sweep</flow>
+        <enabled>true</enabled>
+    </flowAccesses>
+    <flowAccesses>
+        <flow>Codify_Escalate_For_Review</flow>
+        <enabled>true</enabled>
+    </flowAccesses>
 
     <objectPermissions>
         <object>Codify_Resolution_Log__c</object>

@@ -9,3 +9,7 @@
 .vscode
 
 coverage/
+# prettier-plugin-xml hands <flow> element content to its JavaScript-Flow parser,
+# which appends a stray ';' and breaks the value. Permission sets are the only
+# metadata here that carry <flow> elements, so they are formatted by hand.
+**/permissionsets/**
