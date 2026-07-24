@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Codify_Article_Body__c</fullName>
+    <label>Article Body</label>
+    <type>Html</type>
+    <length>32768</length>
+    <visibleLines>25</visibleLines>
+    <description
+  >The drafted article body: symptom, root cause, resolution steps, and provenance. Held on a Codify-owned field so the project does not have to assume the API name of whatever body field an org already uses.</description>
+</CustomField>

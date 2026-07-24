@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Source_Channel__c</fullName>
+    <label>Source Channel</label>
+    <type>Picklist</type>
+    <required>false</required>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>MIAW</fullName><default>true</default><label
+        >MIAW</label></value>
+            <value><fullName>Experience Cloud</fullName><default
+        >false</default><label>Experience Cloud</label></value>
+            <value><fullName>Internal Agent Console</fullName><default
+        >false</default><label>Internal Agent Console</label></value>
+            <value><fullName>Dictation</fullName><default>false</default><label
+        >Dictation</label></value>
+        </valueSetDefinition>
+    </valueSet>
+    <description
+  >Where the recap came in from. MIAW is the primary surface; the others exist because the same agent is reachable from an internal Case page.</description>
+</CustomField>

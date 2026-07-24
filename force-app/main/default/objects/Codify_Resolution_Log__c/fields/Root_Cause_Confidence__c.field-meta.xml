@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Root_Cause_Confidence__c</fullName>
+    <label>Root Cause Confidence</label>
+    <type>Number</type>
+    <precision>5</precision>
+    <scale>2</scale>
+    <required>false</required>
+    <description
+  >How many distinct taxonomy keywords the recap matched, as a 0-1 score. Below the confidence floor Codify refuses to tag and escalates instead.</description>
+</CustomField>

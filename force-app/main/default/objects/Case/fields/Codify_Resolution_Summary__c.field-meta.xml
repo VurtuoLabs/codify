@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Codify_Resolution_Summary__c</fullName>
+    <label>Codify Resolution Summary</label>
+    <type>LongTextArea</type>
+    <length>32768</length>
+    <visibleLines>5</visibleLines>
+    <description
+  >How the Case was actually fixed, in the technician's words, cleaned up. Internal record-keeping, so Codify writes this directly without a confirmation gate.</description>
+</CustomField>

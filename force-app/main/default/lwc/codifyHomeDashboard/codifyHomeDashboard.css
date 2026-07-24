@@ -1,0 +1,6 @@
+.codify-bar {
+  height: var(--slds-g-spacing-3, 0.75rem);
+  border-radius: var(--slds-g-radius-border-2, 0.75rem);
+  background: var(--slds-g-color-accent-container-1, #0176d3);
+  transition: width 0.3s ease;
+}

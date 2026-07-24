@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Related_Record_Id__c</fullName>
+    <label>Related Record Id</label>
+    <type>Text</type>
+    <length>18</length>
+    <required>false</required>
+    <description
+  >Id of the record Codify touched. Text rather than a lookup because the audit trail spans Case, Knowledge, Task and the resolution log itself.</description>
+</CustomField>

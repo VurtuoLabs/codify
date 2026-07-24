@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description
+  >The raw recap history. One record per fix a technician described to Codify, holding the verbatim recap, the extracted resolution summary and root cause, and whether a Knowledge draft came out of it. Every Change Log row traces back to one of these.</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>true</enableHistory>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <label>Codify Resolution Log</label>
+    <nameField>
+        <displayFormat>RES-{00000}</displayFormat>
+        <label>Resolution Log Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Codify Resolution Logs</pluralLabel>
+    <sharingModel>ReadWrite</sharingModel>
+    <visibility>Public</visibility>
+</CustomObject>

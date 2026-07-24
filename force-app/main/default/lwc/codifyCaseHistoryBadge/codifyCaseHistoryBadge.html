@@ -1,0 +1,54 @@
+<template>
+  <template if:true={hasChanges}>
+    <div class="slds-box slds-box_x-small slds-theme_shade">
+      <div
+        class="slds-grid slds-grid_vertical-align-center slds-grid_align-spread"
+      >
+        <div class="slds-grid slds-grid_vertical-align-center">
+          <lightning-icon
+            icon-name="custom:custom18"
+            size="x-small"
+            class="slds-m-right_x-small"
+          ></lightning-icon>
+          <span class="slds-text-body_regular">{badgeLabel}</span>
+        </div>
+        <lightning-button
+          variant="base"
+          label={toggleLabel}
+          onclick={toggle}
+        ></lightning-button>
+      </div>
+
+      <template if:true={expanded}>
+        <ul class="slds-has-dividers_bottom-space slds-p-top_x-small">
+          <template for:each={rows} for:item="row">
+            <li key={row.id} class="slds-item">
+              <div class="slds-text-body_small">{row.title}</div>
+              <div class="slds-grid slds-grid_align-spread">
+                <span class="slds-text-body_small slds-text-color_weak"
+                  >{row.meta}</span
+                >
+                <div>
+                  <template if:true={row.needsReview}>
+                    <span
+                      class="slds-badge slds-badge_inverse slds-m-right_x-small"
+                      >Awaiting review</span
+                    >
+                  </template>
+                  <template if:true={row.recapId}>
+                    <a
+                      data-id={row.recapId}
+                      onclick={openRecap}
+                      class="slds-text-body_small"
+                      >View source recap</a
+                    >
+                  </template>
+                </div>
+              </div>
+            </li>
+          </template>
+        </ul>
+      </template>
+    </div>
+  </template>
+</template>

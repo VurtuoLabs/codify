@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Codify_Suggested_Fix_Source__c</fullName>
+    <label>Codify Suggested Fix Source</label>
+    <type>Text</type>
+    <length>80</length>
+    <required>false</required>
+    <description
+  >Which Case the suggested fix came from, so the owner can see the diagnosis it is based on.</description>
+</CustomField>

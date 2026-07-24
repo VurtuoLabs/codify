@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Logged_By_Technician__c</fullName>
+    <label>Logged By Technician</label>
+    <type>Lookup</type>
+    <referenceTo>User</referenceTo>
+    <relationshipName>Codify_Resolution_Logs</relationshipName>
+    <relationshipLabel>Codify Resolution Logs</relationshipLabel>
+    <required>false</required>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description
+  >Who described the fix. For MIAW sessions this is the mapped portal or partner user.</description>
+</CustomField>

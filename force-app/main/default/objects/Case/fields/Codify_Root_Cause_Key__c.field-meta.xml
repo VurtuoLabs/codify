@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Codify_Root_Cause_Key__c</fullName>
+    <label>Codify Root Cause Key</label>
+    <type>Text</type>
+    <length>80</length>
+    <required>false</required>
+    <description
+  >Stable taxonomy key behind the label. This is what the Related Case Sweep queries on.</description>
+</CustomField>

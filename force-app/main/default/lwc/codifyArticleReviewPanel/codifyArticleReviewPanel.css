@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+.codify-queue-item {
+  padding: var(--slds-g-spacing-2, 0.5rem);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  cursor: pointer;
+}
+
+.codify-queue-item:hover {
+  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+.codify-queue-item_selected {
+  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+  border-left: 3px solid var(--slds-g-color-accent-container-1, #0176d3);
+}
+
+/* The recap is dictated speech: preserve the technician's line breaks so a
+   reviewer reads it as written rather than as one reflowed block. */
+.codify-recap {
+  white-space: pre-wrap;
+}

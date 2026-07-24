@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Codify_Resolved_Via_Codify__c</fullName>
+    <label>Resolved via Codify</label>
+    <type>Checkbox</type>
+    <defaultValue>false</defaultValue>
+    <description
+  >Marks Cases whose resolution was captured through Codify, so service ops can measure adoption against Cases closed the old way.</description>
+</CustomField>

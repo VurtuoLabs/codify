@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Codify_Suggested_Fix__c</fullName>
+    <label>Codify Suggested Fix</label>
+    <type>LongTextArea</type>
+    <length>32768</length>
+    <visibleLines>4</visibleLines>
+    <description
+  >Set by the Related Case Sweep on OTHER open Cases sharing this root cause. A suggestion for whoever owns that Case, never an applied resolution.</description>
+</CustomField>

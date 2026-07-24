@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Codify_Generated__c</fullName>
+    <label>Codify Generated</label>
+    <type>Checkbox</type>
+    <defaultValue>false</defaultValue>
+    <description
+  >Marks drafts Codify authored, so the review queue can be filtered to them and so a reviewer always knows the draft started from a technician's recap.</description>
+</CustomField>

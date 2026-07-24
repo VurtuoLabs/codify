@@ -1,0 +1,19 @@
+# Salesforce DX
+.sf/
+.sfdx/
+.localdevserver/
+deploy-options.json
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+
+# Node
+node_modules/
+
+# Local retrieve scratch
+.retrieve-mdapi/
+.retrieve-tmp/
+.tmpret/

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Codify</label>
+    <description
+  >Review and audit surface for the Codify service agent: resolutions captured, Case fields and root cause tags written, Knowledge drafts awaiting review, and which root causes keep recurring.</description>
+    <navType>Standard</navType>
+    <uiType>Lightning</uiType>
+    <formFactors>Large</formFactors>
+    <brand>
+        <headerColor>#032D60</headerColor>
+        <shouldOverrideOrgTheme>true</shouldOverrideOrgTheme>
+    </brand>
+    <tabs>Codify_Home</tabs>
+    <tabs>Codify_Change_Log</tabs>
+    <tabs>Codify_Resolution_Log__c</tabs>
+    <tabs>Codify_Pending_Article_Reviews</tabs>
+    <tabs>Codify_Root_Cause_Trends</tabs>
+    <tabs>Codify_Change_Log__c</tabs>
+    <tabs>standard-Case</tabs>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+</CustomApplication>

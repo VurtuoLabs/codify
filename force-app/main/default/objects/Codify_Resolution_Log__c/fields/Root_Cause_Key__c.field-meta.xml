@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Root_Cause_Key__c</fullName>
+    <label>Root Cause Key</label>
+    <type>Text</type>
+    <length>80</length>
+    <required>false</required>
+    <description
+  >The stable taxonomy key behind the label. The Related Case Sweep matches on this, not on the display label.</description>
+</CustomField>
