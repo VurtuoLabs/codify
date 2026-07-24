@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Extraction_JSON__c</fullName>
+    <label>Extraction JSON</label>
+    <type>LongTextArea</type>
+    <length>32768</length>
+    <visibleLines>5</visibleLines>
+    <description
+  >The single cached parse of the recap. Every downstream topic reads this instead of re-parsing the text, which is what makes "one recap, multiple outputs" true in code rather than just in the pitch.</description>
+</CustomField>

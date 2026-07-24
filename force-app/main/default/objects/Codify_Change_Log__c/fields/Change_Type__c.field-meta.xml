@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Change_Type__c</fullName>
+    <label>Change Type</label>
+    <type>Picklist</type>
+    <required>false</required>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Resolution Logged</fullName><default
+        >false</default><label>Resolution Logged</label></value>
+            <value><fullName>Case Field Update</fullName><default
+        >false</default><label>Case Field Update</label></value>
+            <value><fullName>Root Cause Tagged</fullName><default
+        >false</default><label>Root Cause Tagged</label></value>
+            <value><fullName>Article Drafted</fullName><default
+        >false</default><label>Article Drafted</label></value>
+            <value><fullName>Related Case Flagged</fullName><default
+        >false</default><label>Related Case Flagged</label></value>
+            <value><fullName>Escalated for Review</fullName><default
+        >false</default><label>Escalated for Review</label></value>
+        </valueSetDefinition>
+    </valueSet>
+    <description>What kind of action produced this audit row.</description>
+</CustomField>

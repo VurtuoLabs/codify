@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Field_Updates_Only</fullName>
+    <columns>NAME</columns>
+    <columns>Object_API_Name__c</columns>
+    <columns>Related_Record_Name__c</columns>
+    <columns>Field_Name__c</columns>
+    <columns>Old_Value__c</columns>
+    <columns>New_Value__c</columns>
+    <columns>CREATED_DATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Change_Type__c</field>
+        <operation>equals</operation>
+        <value>Case Field Update</value>
+    </filters>
+    <label>Field Updates Only</label>
+</ListView>

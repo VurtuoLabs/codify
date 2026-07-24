@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Source_Resolution_Log__c</fullName>
+    <label>Source Resolution Log</label>
+    <type>Lookup</type>
+    <referenceTo>Codify_Resolution_Log__c</referenceTo>
+    <relationshipName>Change_Logs</relationshipName>
+    <relationshipLabel>Change Logs</relationshipLabel>
+    <required>false</required>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description
+  >Ties every change back to the exact recap that produced it.</description>
+</CustomField>

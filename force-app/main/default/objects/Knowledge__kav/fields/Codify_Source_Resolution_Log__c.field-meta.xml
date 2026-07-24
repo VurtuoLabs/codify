@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Codify_Source_Resolution_Log__c</fullName>
+    <label>Codify Source Resolution Log</label>
+    <type>Text</type>
+    <length>18</length>
+    <required>false</required>
+    <description
+  >Id of the resolution log this draft came from. Text rather than a lookup because Knowledge article versions do not carry custom lookups cleanly across publish.</description>
+</CustomField>

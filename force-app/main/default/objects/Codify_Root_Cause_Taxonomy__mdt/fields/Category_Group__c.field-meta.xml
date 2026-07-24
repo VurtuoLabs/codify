@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Category_Group__c</fullName>
+    <label>Category Group</label>
+    <type>Text</type>
+    <length>80</length>
+    <required>false</required>
+    <description
+  >Coarse grouping (Hardware, Software, Configuration, Process, Environmental, User Error). Two root causes in the same group are treated as closely related by the sweep.</description>
+</CustomField>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >The standard root cause categories the classifier tags against. Configurable per business vertical without touching Apex: add or retire a row here and Codify classifies against the new taxonomy on the next recap.</description>
+    <label>Codify Root Cause Taxonomy</label>
+    <pluralLabel>Codify Root Cause Taxonomy</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

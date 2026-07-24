@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Codify_Drafts_Pending_Review</fullName>
+    <columns>TITLE</columns>
+    <columns>Codify_Root_Cause__c</columns>
+    <columns>Codify_Source_Case__c</columns>
+    <columns>PUBLISH_STATUS</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Codify_Generated__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <filters>
+        <field>PUBLISH_STATUS</field>
+        <operation>equals</operation>
+        <value>Draft</value>
+    </filters>
+    <label>Codify Drafts Pending Review</label>
+</ListView>

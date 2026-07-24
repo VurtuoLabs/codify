@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Resolution_Summary__c</fullName>
+    <label>Resolution Summary</label>
+    <type>LongTextArea</type>
+    <length>32768</length>
+    <visibleLines>4</visibleLines>
+    <description
+  >The extracted, cleaned-up summary of the fix that was written to the Case.</description>
+</CustomField>

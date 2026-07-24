@@ -1,0 +1,152 @@
+<template>
+  <lightning-card
+    title="Pending Article Reviews"
+    icon-name="standard:knowledge"
+  >
+    <span slot="actions" class="slds-text-body_small slds-text-color_weak"
+      >{queueCountLabel}</span
+    >
+
+    <template if:true={error}>
+      <div class="slds-p-horizontal_medium slds-text-color_error" role="alert">
+        {error}
+      </div>
+    </template>
+
+    <template if:false={hasArticles}>
+      <div
+        class="slds-p-around_large slds-align_absolute-center slds-text-color_weak"
+      >
+        No Codify drafts are waiting for review.
+      </div>
+    </template>
+
+    <template if:true={hasArticles}>
+      <div
+        class="slds-grid slds-gutters slds-wrap slds-p-horizontal_medium slds-p-bottom_medium"
+      >
+        <!-- The queue -->
+        <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-4">
+          <ul class="slds-has-dividers_bottom-space">
+            <template for:each={queue} for:item="a">
+              <li
+                key={a.id}
+                class={a.itemClass}
+                data-id={a.id}
+                onclick={handleSelect}
+              >
+                <div
+                  class="slds-text-body_regular slds-truncate"
+                  title={a.title}
+                >
+                  {a.title}
+                </div>
+                <div class="slds-text-body_small slds-text-color_weak">
+                  {a.rootCause}
+                </div>
+                <div class="slds-text-body_small slds-text-color_weak">
+                  <template if:true={a.sourceCaseNumber}
+                    >Case {a.sourceCaseNumber} ·
+                  </template>
+                  {a.technicianName}
+                </div>
+              </li>
+            </template>
+          </ul>
+        </div>
+
+        <!-- Side-by-side: the draft, and the recap it came from -->
+        <template if:true={selected}>
+          <div class="slds-col slds-size_1-of-1 slds-large-size_2-of-4">
+            <div class="slds-box slds-box_x-small">
+              <h3 class="slds-text-title_caps slds-p-bottom_x-small">
+                Draft article
+              </h3>
+              <lightning-input
+                label="Title"
+                value={draftTitle}
+                onchange={handleTitle}
+                class="slds-p-bottom_x-small"
+              ></lightning-input>
+              <lightning-textarea
+                label="Summary"
+                value={draftSummary}
+                onchange={handleSummary}
+                class="slds-p-bottom_x-small"
+              ></lightning-textarea>
+              <lightning-input-rich-text
+                label="Body"
+                value={draftBody}
+                onchange={handleBody}
+              ></lightning-input-rich-text>
+
+              <div
+                class="slds-p-top_small slds-grid slds-grid_vertical-align-center slds-wrap"
+              >
+                <lightning-button
+                  label="Save draft"
+                  variant="brand"
+                  onclick={handleSave}
+                  disabled={isSaving}
+                  class="slds-m-right_x-small"
+                ></lightning-button>
+                <lightning-button
+                  label="Reject draft"
+                  variant="destructive-text"
+                  onclick={handleReject}
+                  disabled={isSaving}
+                ></lightning-button>
+              </div>
+              <lightning-input
+                data-id="reject-reason"
+                label="Reason (if rejecting)"
+                placeholder="Duplicates an existing article…"
+                class="slds-p-top_x-small"
+              ></lightning-input>
+
+              <p
+                class="slds-text-body_small slds-text-color_weak slds-p-top_small"
+              >
+                Saving keeps this in Draft. Publish it through Knowledge when
+                you are satisfied it is accurate — Codify never publishes.
+              </p>
+            </div>
+          </div>
+
+          <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-4">
+            <div class="slds-box slds-box_x-small slds-theme_shade">
+              <h3 class="slds-text-title_caps slds-p-bottom_x-small">
+                What the technician said
+              </h3>
+              <p class="slds-text-body_small codify-recap">
+                {selected.originalRecap}
+              </p>
+
+              <div class="slds-p-top_small slds-text-body_small">
+                <template if:true={selected.sourceCaseId}>
+                  <a data-id={selected.sourceCaseId} onclick={openRecord}
+                    >Open Case {selected.sourceCaseNumber}</a
+                  ><br />
+                </template>
+                <template if:true={selected.sourceResolutionLogId}>
+                  <a
+                    data-id={selected.sourceResolutionLogId}
+                    onclick={openRecord}
+                    >Open {selected.sourceResolutionLogName}</a
+                  >
+                </template>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </template>
+
+    <template if:true={isSaving}>
+      <lightning-spinner
+        alternative-text="Saving"
+        size="small"
+      ></lightning-spinner>
+    </template>
+  </lightning-card>
+</template>

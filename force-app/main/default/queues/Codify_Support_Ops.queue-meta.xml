@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  The human fallback behind Codify.
+
+  This queue does double duty, deliberately. It is the messaging channel's
+  session handler, so a MIAW session that needs a person (the technician asks to
+  talk to someone, or the session is transferred) lands with Support Ops rather
+  than nowhere. It is also the owner group for the follow-up work
+  Codify_EscalateForReviewInvocable raises when a recap is too thin to classify,
+  and for Knowledge drafts waiting on review.
+
+  Those are the same people in practice: the service ops and Knowledge owners who
+  pick up whatever Codify deliberately refused to guess at. Splitting them into
+  three queues would fragment one real backlog across three places nobody checks.
+-->
+<Queue xmlns="http://soap.sforce.com/2006/04/metadata">
+    <doesSendEmailToMembers>false</doesSendEmailToMembers>
+    <name>Codify Support Ops</name>
+    <queueSobject>
+        <sobjectType>Case</sobjectType>
+    </queueSobject>
+</Queue>

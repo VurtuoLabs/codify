@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Detection_Keywords__c</fullName>
+    <label>Detection Keywords</label>
+    <type>LongTextArea</type>
+    <length>2048</length>
+    <visibleLines>3</visibleLines>
+    <description
+  >Comma-separated, case-insensitive keywords. The classifier scores a recap against these; the highest-scoring active row wins, and no row clearing the confidence floor means no tag.</description>
+</CustomField>

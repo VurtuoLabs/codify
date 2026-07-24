@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Root_Cause_Label__c</fullName>
+    <label>Root Cause Label</label>
+    <type>Text</type>
+    <length>255</length>
+    <required>true</required>
+    <description
+  >What a human sees on the Case and in the trends tab. Safe to reword without breaking the sweep.</description>
+</CustomField>

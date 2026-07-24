@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Codify_Root_Cause__c</fullName>
+    <label>Codify Root Cause</label>
+    <type>Text</type>
+    <length>255</length>
+    <required>false</required>
+    <description
+  >The root cause this article addresses, so published knowledge can be searched by cause as well as symptom.</description>
+</CustomField>

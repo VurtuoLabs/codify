@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+    <label>Defective Replacement Part</label>
+    <protected>false</protected>
+    <values><field>Root_Cause_Key__c</field><value
+      xsi:type="xsd:string"
+    >Defective_Part</value></values>
+    <values><field>Root_Cause_Label__c</field><value
+      xsi:type="xsd:string"
+    >Defective Replacement Part</value></values>
+    <values><field>Category_Group__c</field><value
+      xsi:type="xsd:string"
+    >Hardware</value></values>
+    <values><field>Detection_Keywords__c</field><value
+      xsi:type="xsd:string"
+    >defective part,bad part,dead on arrival,doa,wrong part,part was faulty,replacement failed</value></values>
+    <values><field>Article_Worthy__c</field><value
+      xsi:type="xsd:boolean"
+    >false</value></values>
+    <values><field>Related_Keys__c</field><value
+      xsi:type="xsd:string"
+    >Hardware_Component_Failure</value></values>
+    <values><field>Sort_Order__c</field><value
+      xsi:type="xsd:double"
+    >70</value></values>
+    <values><field>Is_Active__c</field><value
+      xsi:type="xsd:boolean"
+    >true</value></values>
+</CustomMetadata>

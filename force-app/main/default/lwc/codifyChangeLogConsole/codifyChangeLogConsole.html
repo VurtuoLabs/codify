@@ -1,0 +1,108 @@
+<template>
+  <lightning-card title="Codify Change Log" icon-name="custom:custom18">
+    <span slot="actions" class="slds-text-body_small slds-text-color_weak"
+      >{rowCountLabel}</span
+    >
+
+    <div class="slds-p-horizontal_medium slds-p-bottom_small">
+      <div
+        class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end"
+      >
+        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+          <lightning-combobox
+            label="Technician"
+            value={technicianFilter}
+            options={technicianOptions}
+            onchange={handleTechnician}
+          ></lightning-combobox>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+          <lightning-input
+            type="text"
+            label="Case Id"
+            value={caseFilter}
+            placeholder="500..."
+            onchange={handleCase}
+            oncommit={handleCaseCommit}
+          ></lightning-input>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+          <lightning-combobox
+            label="Root cause"
+            value={rootCauseFilter}
+            options={rootCauseOptions}
+            onchange={handleRootCause}
+          ></lightning-combobox>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+          <lightning-combobox
+            label="Change type"
+            value={typeFilter}
+            options={typeOptions}
+            onchange={handleType}
+          ></lightning-combobox>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+          <lightning-input
+            type="date"
+            label="From"
+            value={startDate}
+            onchange={handleStart}
+          ></lightning-input>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+          <lightning-input
+            type="date"
+            label="To"
+            value={endDate}
+            onchange={handleEnd}
+          ></lightning-input>
+        </div>
+      </div>
+      <div class="slds-p-top_x-small">
+        <lightning-button
+          label="Reset filters"
+          onclick={handleReset}
+          variant="neutral"
+        ></lightning-button>
+      </div>
+    </div>
+
+    <template if:true={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+
+    <template if:true={error}>
+      <div class="slds-p-horizontal_medium slds-text-color_error" role="alert">
+        {error}
+      </div>
+    </template>
+
+    <template if:true={hasRows}>
+      <div class="slds-p-horizontal_x-small codify-table">
+        <lightning-datatable
+          key-field="id"
+          data={rows}
+          columns={columns}
+          hide-checkbox-column
+          onrowaction={handleRowAction}
+          column-widths-mode="auto"
+        >
+        </lightning-datatable>
+      </div>
+    </template>
+
+    <template if:false={hasRows}>
+      <template if:false={isLoading}>
+        <div
+          class="slds-p-around_large slds-align_absolute-center slds-text-color_weak"
+        >
+          No changes match these filters yet.
+        </div>
+      </template>
+    </template>
+  </lightning-card>
+</template>

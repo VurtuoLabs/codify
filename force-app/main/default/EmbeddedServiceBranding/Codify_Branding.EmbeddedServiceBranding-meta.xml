@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Branding for the embedded Codify window.
+
+  These values are the platform-level counterpart to experience-site/head-markup.html:
+  the head markup restyles what lives inside the messaging window's shadow DOM,
+  while this controls the chrome the platform renders around it. They are kept in
+  step deliberately, if you change the accent here, change BRAND.accent there too,
+  or the launcher and the conversation will disagree with each other.
+-->
+<EmbeddedServiceBranding xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Codify Branding</masterLabel>
+    <embeddedServiceConfig>Codify_Embedded</embeddedServiceConfig>
+    <!-- Salesforce-family blue: this is an internal service tool inside a portal,
+         not consumer-facing brand furniture. -->
+    <primaryColor>#0176D3</primaryColor>
+    <secondaryColor>#014486</secondaryColor>
+    <navBarColor>#0B0F14</navBarColor>
+    <navBarTextColor>#E8EAED</navBarTextColor>
+    <contrastPrimaryColor>#0B0F14</contrastPrimaryColor>
+    <contrastInvertedColor>#FFFFFF</contrastInvertedColor>
+    <font>Salesforce Sans</font>
+    <height>580</height>
+    <width>360</width>
+</EmbeddedServiceBranding>

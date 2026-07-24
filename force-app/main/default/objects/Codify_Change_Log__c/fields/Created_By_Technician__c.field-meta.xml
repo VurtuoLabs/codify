@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Created_By_Technician__c</fullName>
+    <label>Created By Technician</label>
+    <type>Lookup</type>
+    <referenceTo>User</referenceTo>
+    <relationshipName>Codify_Change_Logs</relationshipName>
+    <relationshipLabel>Codify Change Logs</relationshipLabel>
+    <required>false</required>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Whose session produced this change.</description>
+</CustomField>

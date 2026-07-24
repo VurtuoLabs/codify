@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>By_Root_Cause</fullName>
+    <columns>NAME</columns>
+    <columns>Root_Cause_Category__c</columns>
+    <columns>Root_Cause_Confidence__c</columns>
+    <columns>Case__c</columns>
+    <columns>Related_Cases_Flagged__c</columns>
+    <columns>CREATED_DATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Root_Cause_Category__c</field>
+        <operation>notEqual</operation>
+        <value />
+    </filters>
+    <label>By Root Cause</label>
+</ListView>

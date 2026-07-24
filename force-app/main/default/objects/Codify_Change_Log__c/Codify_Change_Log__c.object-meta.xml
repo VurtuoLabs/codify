@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description
+  >The audit backbone. One record per action Codify takes (Case field update, root cause tag, article draft created, related case flagged, escalation raised). Not optional: the goal is that nothing the agent does is invisible to service ops.</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>true</enableHistory>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <label>Codify Change Log</label>
+    <nameField>
+        <displayFormat>CCHG-{00000}</displayFormat>
+        <label>Change Log Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Codify Change Logs</pluralLabel>
+    <sharingModel>ReadWrite</sharingModel>
+    <visibility>Public</visibility>
+</CustomObject>

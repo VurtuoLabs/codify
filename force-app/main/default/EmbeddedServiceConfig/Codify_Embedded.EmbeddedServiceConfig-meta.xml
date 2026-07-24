@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  The embedded service deployment: the actual window a technician sees, dropped
+  onto an Experience Cloud Case detail page (and optionally onto an internal Case
+  Lightning page for agents who prefer it to the native Agentforce chat).
+
+  areGuestUsersAllowed is false. Codify writes to real Cases and drafts real
+  Knowledge, so every session is tied to an authenticated portal or partner user
+  whose identity lands on the audit trail. The brief allows for rare
+  fully-external franchise setups; those should run through a separate deployment
+  with an identity step rather than by loosening this one, because an
+  unattributable Case update defeats the point of the change log.
+
+  The Case context fields below are hidden. They are populated programmatically
+  by the host page from the record the technician launched from, not typed in.
+  Asking a field technician to key a Case id would be exactly the friction this
+  is meant to remove, and would introduce typos into the audit trail.
+-->
+<EmbeddedServiceConfig xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Codify</masterLabel>
+    <isEnabled>true</isEnabled>
+    <areGuestUsersAllowed>false</areGuestUsersAllowed>
+    <deploymentFeature>EmbeddedMessaging</deploymentFeature>
+    <deploymentType>Web</deploymentType>
+    <shouldHideAuthDialog>false</shouldHideAuthDialog>
+    <!-- Deploy EmbeddedServiceConfig before EmbeddedServiceBranding: the two
+         reference each other, so branding cannot land until the config exists. -->
+    <branding>Codify_Branding</branding>
+    <isTermsAndConditionsEnabled>false</isTermsAndConditionsEnabled>
+    <isTermsAndConditionsRequired>false</isTermsAndConditionsRequired>
+
+    <!--
+      REQUIRED, and org-specific. Every embedded messaging deployment needs its
+      own ESW site, and a site can only back one deployment. Salesforce creates
+      these when you add the deployment in Setup (Embedded Service Deployments →
+      New), so it cannot be authored from source the way the rest of this repo
+      can. Replace this with the ESW site name from your org before deploying;
+      see the MIAW setup steps in the README.
+    -->
+    <site>ESW_Codify_Placeholder</site>
+
+    <embeddedServiceForms>
+        <displayContext>Conversation</displayContext>
+        <!-- Identity of whoever is logging the fix, so the change log attributes it. -->
+        <embeddedServiceFormFields>
+            <displayOrder>0</displayOrder>
+            <formField>_FirstName</formField>
+            <formFieldType>Text</formFieldType>
+            <isHidden>true</isHidden>
+            <isRequired>false</isRequired>
+            <messagingChannelParameterType
+      >Standard</messagingChannelParameterType>
+        </embeddedServiceFormFields>
+        <embeddedServiceFormFields>
+            <displayOrder>1</displayOrder>
+            <formField>_LastName</formField>
+            <formFieldType>Text</formFieldType>
+            <isHidden>true</isHidden>
+            <isRequired>false</isRequired>
+            <messagingChannelParameterType
+      >Standard</messagingChannelParameterType>
+        </embeddedServiceFormFields>
+        <embeddedServiceFormFields>
+            <displayOrder>2</displayOrder>
+            <formField>_Email</formField>
+            <formFieldType>Email</formFieldType>
+            <isHidden>true</isHidden>
+            <isRequired>false</isRequired>
+            <messagingChannelParameterType
+      >Standard</messagingChannelParameterType>
+        </embeddedServiceFormFields>
+        <!-- Carries the Case subject through so the welcome panel can show it. -->
+        <embeddedServiceFormFields>
+            <displayOrder>3</displayOrder>
+            <formField>_Subject</formField>
+            <formFieldType>Text</formFieldType>
+            <isHidden>true</isHidden>
+            <isRequired>false</isRequired>
+            <messagingChannelParameterType
+      >Standard</messagingChannelParameterType>
+        </embeddedServiceFormFields>
+        <isActive>true</isActive>
+    </embeddedServiceForms>
+
+    <embeddedServiceMessagingChannel>
+        <messagingChannel>Codify_MIAW</messagingChannel>
+        <isEnabled>true</isEnabled>
+        <isChatInvitationCustomizable>false</isChatInvitationCustomizable>
+        <!--
+          No proactive invitation. Codify should appear when a technician is
+          closing a Case, not interrupt them mid-job asking whether they have
+          fixed it yet.
+        -->
+        <isInvitationEnabled>false</isInvitationEnabled>
+        <isSendInvtAllowedAfterAccept>false</isSendInvtAllowedAfterAccept>
+        <isSendInvtAllowedAfterReject>false</isSendInvtAllowedAfterReject>
+        <shouldShowDeliveryReceipts>false</shouldShowDeliveryReceipts>
+        <shouldShowReadReceipts>false</shouldShowReadReceipts>
+        <shouldShowTypingIndicators>true</shouldShowTypingIndicators>
+        <shouldShowEmojiSelection>false</shouldShowEmojiSelection>
+        <!--
+          Enter sends. Recaps are often dictated in one go, and making Enter
+          insert a newline would leave technicians typing into a window that
+          never submits.
+        -->
+        <shouldStartNewLineOnEnter>false</shouldStartNewLineOnEnter>
+    </embeddedServiceMessagingChannel>
+</EmbeddedServiceConfig>

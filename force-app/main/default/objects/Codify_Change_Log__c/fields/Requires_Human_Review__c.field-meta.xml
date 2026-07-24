@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Requires_Human_Review__c</fullName>
+    <label>Requires Human Review</label>
+    <type>Checkbox</type>
+    <defaultValue>false</defaultValue>
+    <description
+  >True for anything that must not go live without a person approving it, above all Knowledge drafts. Case field updates are internal record-keeping and land false.</description>
+</CustomField>
