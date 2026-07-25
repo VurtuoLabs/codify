@@ -8,7 +8,7 @@ import getSummary from "@salesforce/apex/Codify_HomeDashboardController.getSumma
  * privileged and every figure the controller returns appears somewhere. The
  * pipeline is still the story — described, tagged, drafted, published — but it
  * reads as four comparable cards sitting in the same grid as the work still
- * waiting on a person.
+ * waiting on a person, with no banner or summary line above them.
  *
  * Cards are assembled in JS rather than hand-written in the template so they stay
  * uniform by construction: same shape, same empty-state handling, and adding a
@@ -204,37 +204,6 @@ export default class CodifyHomeDashboard extends LightningElement {
       count: t.count,
       style: `height:${Math.max(Math.round((t.count / max) * 100), 2)}%`
     }));
-  }
-
-  /**
-   * States what the knowledge base gained, in a sentence. A bare count does not
-   * tell anyone whether the week went well.
-   */
-  get headline() {
-    const n = this.s.resolutionsThisWeek || 0;
-    if (n === 0) {
-      return "No fixes captured yet this week.";
-    }
-    const published = this.s.articlesPublished || 0;
-    return `${n} fix${n === 1 ? "" : "es"} captured this week, with ${published} published article${published === 1 ? "" : "s"} standing behind them.`;
-  }
-
-  get subhead() {
-    const pending = this.s.articlesPending || 0;
-    const untagged = this.s.resolutionsUntagged || 0;
-    if (pending === 0 && untagged === 0) {
-      return "Nothing is waiting on a person right now.";
-    }
-    const bits = [];
-    if (pending > 0) {
-      bits.push(`${pending} draft${pending === 1 ? "" : "s"} awaiting review`);
-    }
-    if (untagged > 0) {
-      bits.push(
-        `${untagged} recap${untagged === 1 ? "" : "s"} Codify would not classify`
-      );
-    }
-    return bits.join(" · ");
   }
 
   reduceError(error) {

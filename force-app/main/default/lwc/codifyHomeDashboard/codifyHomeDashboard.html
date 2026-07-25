@@ -1,11 +1,5 @@
 <template>
   <div class="codify-home">
-    <header class="codify-hero">
-      <p class="codify-hero__eyebrow">Codify</p>
-      <h1 class="codify-hero__headline">{headline}</h1>
-      <p class="codify-hero__sub">{subhead}</p>
-    </header>
-
     <template if:true={error}>
       <div class="slds-text-color_error slds-p-around_small" role="alert">
         {error}

@@ -33,39 +33,6 @@
   padding-bottom: 1rem;
 }
 
-/* ── Hero ─────────────────────────────────────────────────────────────── */
-.codify-hero {
-  background: var(--codify-ink);
-  color: #fff;
-  padding: 1.75rem 2rem 2rem;
-  border-radius: 0 0 var(--slds-g-radius-border-4, 1rem)
-    var(--slds-g-radius-border-4, 1rem);
-}
-
-.codify-hero__eyebrow {
-  margin: 0 0 0.5rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--codify-accent-soft);
-}
-
-.codify-hero__headline {
-  margin: 0;
-  font-size: 1.5rem;
-  line-height: 1.3;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  max-width: 46ch;
-}
-
-.codify-hero__sub {
-  margin: 0.7rem 0 0;
-  font-size: 0.85rem;
-  color: #b9c2cc;
-}
-
 /* ── Grid ─────────────────────────────────────────────────────────────── */
 .codify-grid {
   display: grid;
@@ -237,13 +204,4 @@
   font-size: 0.68rem;
   color: var(--codify-muted);
   font-variant-numeric: tabular-nums;
-}
-
-@media (max-width: 30rem) {
-  .codify-hero {
-    padding: 1.5rem 1.25rem;
-  }
-  .codify-hero__headline {
-    font-size: 1.25rem;
-  }
 }
