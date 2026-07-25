@@ -1,6 +1,5 @@
 <template>
   <div class="codify-home">
-    <!-- Headline: what the knowledge base gained, in words, not a bare number. -->
     <header class="codify-hero">
       <p class="codify-hero__eyebrow">Codify</p>
       <h1 class="codify-hero__headline">{headline}</h1>
@@ -14,99 +13,54 @@
     </template>
 
     <div class="codify-grid">
-      <!-- The funnel is the page. Everything else supports it. -->
-      <section class="codify-panel codify-panel_wide">
-        <h2 class="codify-panel__title">
-          From a spoken fix to published knowledge
-        </h2>
-        <p class="codify-panel__hint">
-          Each bar is measured against every fix ever described, so a stage that
-          loses most of its input looks like it.
-        </p>
+      <!-- The pipeline: four cards in the same shape as every other card, each
+           measured against the first so the drop-off is visible. -->
+      <template for:each={statCards} for:item="c">
+        <section key={c.key} class="codify-card">
+          <h2 class="codify-card__title">{c.title}</h2>
+          <p class="codify-card__value">{c.value}</p>
+          <div class="codify-track">
+            <div class={c.barClass} style={c.style}></div>
+          </div>
+          <p class="codify-card__meta">{c.pctLabel}</p>
+          <p class="codify-card__note">{c.note}</p>
+        </section>
+      </template>
 
-        <template if:false={hasData}>
-          <p class="codify-empty">
-            Nothing captured yet. The funnel fills in as technicians describe
-            fixes.
-          </p>
-        </template>
-
-        <template if:true={hasData}>
-          <ul class="codify-funnel">
-            <template for:each={funnel} for:item="stage">
-              <li key={stage.key} class="codify-funnel__row">
-                <div class="codify-funnel__head">
-                  <span class="codify-funnel__label">{stage.label}</span>
-                  <span class="codify-funnel__value">{stage.value}</span>
-                </div>
-                <div class="codify-funnel__track">
-                  <div class={stage.barClass} style={stage.style}></div>
-                  <span class="codify-funnel__pct">{stage.pctLabel}</span>
-                </div>
-                <div class="codify-funnel__foot">
-                  <span class="codify-funnel__note">{stage.note}</span>
-                  <template if:true={stage.showDrop}>
-                    <span class="codify-funnel__drop">{stage.dropLabel}</span>
-                  </template>
-                </div>
-              </li>
-            </template>
-          </ul>
-        </template>
-      </section>
-
-      <!-- Work waiting on a person. Given equal billing on purpose. -->
-      <section class="codify-panel codify-panel_action">
-        <h2 class="codify-panel__title">Waiting on a human</h2>
-
-        <div class="codify-stat">
-          <span class="codify-stat__num">{pendingReview}</span>
-          <span class="codify-stat__label"
-            >drafts to review before they go live</span
-          >
-        </div>
-        <div class="codify-stat">
-          <span class="codify-stat__num codify-stat__num_warn">{untagged}</span>
-          <span class="codify-stat__label"
-            >recaps Codify refused to classify rather than guess</span
-          >
-        </div>
-        <div class="codify-stat">
-          <span class="codify-stat__num">{escalations}</span>
-          <span class="codify-stat__label">escalations raised this week</span>
-        </div>
-
-        <p class="codify-panel__hint codify-panel__hint_tight">
+      <!-- Work that needs a person, given the same weight as the successes. -->
+      <section class="codify-card codify-card_wide">
+        <h2 class="codify-card__title">Waiting on a human</h2>
+        <ul class="codify-rows">
+          <template for:each={waitingRows} for:item="r">
+            <li key={r.key} class="codify-row">
+              <span class={r.valueClass}>{r.value}</span>
+              <span class="codify-row__label">{r.label}</span>
+            </li>
+          </template>
+        </ul>
+        <p class="codify-card__note">
           A refusal is the system working. A wrong root cause would push the
           wrong fix onto other people's open cases.
         </p>
       </section>
 
-      <!-- Reach: one diagnosis clearing a backlog. -->
-      <section class="codify-panel codify-panel_reach">
-        <h2 class="codify-panel__title">Reach beyond one case</h2>
-        <div class="codify-stat codify-stat_big">
-          <span class="codify-stat__num">{casesFlagged}</span>
-          <span class="codify-stat__label"
-            >other open cases handed a suggested fix this week</span
-          >
-        </div>
-      </section>
-
-      <!-- Recurrence, as a ranked bar list rather than a table. -->
-      <section class="codify-panel">
-        <h2 class="codify-panel__title">What keeps breaking</h2>
-        <p class="codify-panel__hint">Root causes, last 90 days.</p>
-
+      <section class="codify-card">
+        <h2 class="codify-card__title">What keeps breaking</h2>
+        <p class="codify-card__meta">Root causes, last 90 days.</p>
         <template if:true={hasRootCauses}>
-          <ul class="codify-causes">
-            <template for:each={topRootCauses} for:item="c">
-              <li key={c.label} class="codify-causes__row">
-                <span class="codify-causes__label">{c.label}</span>
-                <span class="codify-causes__track">
-                  <span class="codify-causes__bar" style={c.style}></span>
+          <ul class="codify-bars">
+            <template for:each={rootCauseBars} for:item="b">
+              <li key={b.label} class="codify-bars__row">
+                <span class="codify-bars__label" title={b.label}
+                  >{b.label}</span
+                >
+                <span class="codify-track">
+                  <span
+                    class="codify-bar codify-bar_drafted"
+                    style={b.style}
+                  ></span>
                 </span>
-                <span class="codify-causes__count">{c.count}</span>
+                <span class="codify-bars__count">{b.count}</span>
               </li>
             </template>
           </ul>
@@ -116,10 +70,61 @@
         </template>
       </section>
 
-      <!-- Cadence, as a compact column chart. -->
-      <section class="codify-panel">
-        <h2 class="codify-panel__title">Capture cadence</h2>
-        <p class="codify-panel__hint">Fixes described, last 7 days.</p>
+      <section class="codify-card">
+        <h2 class="codify-card__title">Who's capturing fixes</h2>
+        <p class="codify-card__meta">Recaps logged this week.</p>
+        <template if:true={hasTechnicians}>
+          <ul class="codify-bars">
+            <template for:each={technicianBars} for:item="b">
+              <li key={b.label} class="codify-bars__row">
+                <span class="codify-bars__label" title={b.label}
+                  >{b.label}</span
+                >
+                <span class="codify-track">
+                  <span
+                    class="codify-bar codify-bar_tagged"
+                    style={b.style}
+                  ></span>
+                </span>
+                <span class="codify-bars__count">{b.count}</span>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template if:false={hasTechnicians}>
+          <p class="codify-empty">No recaps logged this week.</p>
+        </template>
+      </section>
+
+      <section class="codify-card">
+        <h2 class="codify-card__title">What Codify did</h2>
+        <p class="codify-card__meta">Audited actions this week, by type.</p>
+        <template if:true={hasChangeTypes}>
+          <ul class="codify-bars">
+            <template for:each={changeTypeBars} for:item="b">
+              <li key={b.label} class="codify-bars__row">
+                <span class="codify-bars__label" title={b.label}
+                  >{b.label}</span
+                >
+                <span class="codify-track">
+                  <span
+                    class="codify-bar codify-bar_published"
+                    style={b.style}
+                  ></span>
+                </span>
+                <span class="codify-bars__count">{b.count}</span>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template if:false={hasChangeTypes}>
+          <p class="codify-empty">Nothing recorded this week.</p>
+        </template>
+      </section>
+
+      <section class="codify-card">
+        <h2 class="codify-card__title">Capture cadence</h2>
+        <p class="codify-card__meta">Fixes described, last 7 days.</p>
         <div class="codify-spark">
           <template for:each={trend} for:item="t">
             <div key={t.key} class="codify-spark__col" title={t.label}>
@@ -130,5 +135,11 @@
         </div>
       </section>
     </div>
+
+    <template if:false={hasData}>
+      <p class="codify-empty codify-empty_page">
+        Nothing captured yet. These fill in as technicians describe fixes.
+      </p>
+    </template>
   </div>
 </template>
