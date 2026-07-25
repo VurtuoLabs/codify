@@ -25,16 +25,23 @@
     <shouldHideAuthDialog>false</shouldHideAuthDialog>
     <isTermsAndConditionsEnabled>false</isTermsAndConditionsEnabled>
     <isTermsAndConditionsRequired>false</isTermsAndConditionsRequired>
-
     <!--
-      REQUIRED, and org-specific. Every embedded messaging deployment needs its
-      own ESW site, and a site can only back one deployment. Salesforce creates
-      these when you add the deployment in Setup (Embedded Service Deployments →
-      New), so it cannot be authored from source the way the rest of this repo
-      can. Replace this with the ESW site name from your org before deploying;
-      see the MIAW setup steps in the README.
+      MUST be a dedicated ESW site, and this value is a placeholder.
+
+      Pointing this at an ordinary Experience site (it was Codify1, the live
+      Codify portal) looks like it works — the metadata deploys clean — but the
+      deployment can then never be published. Its config endpoint stays on
+      HTTP 412 "Embedded Messaging Config is not Published", the widget never
+      renders, and Setup fails to change the CWC version with "Your site
+      properties didn't update".
+
+      ESW sites are minted only by Setup -> Embedded Service Deployments -> New.
+      The Tooling API refuses to create a deployment without one
+      (REQUIRED_FIELD_MISSING: SiteId) and will not mint it, so this cannot be
+      bootstrapped from source. Create the deployment in Setup, then copy the
+      generated ESW_... site name here. See experience-site/README.md.
     -->
-    <site>Codify1</site>
+    <site>ESW_Codify_PLACEHOLDER</site>
 
     <embeddedServiceMessagingChannel>
         <messagingChannel>Codify_MIAW</messagingChannel>
