@@ -9,7 +9,7 @@ config:
     agent_label: "Codify"
     description: "A service agent, deployed over Messaging for In-App and Web, that captures how a Case was resolved and turns it into permanent knowledge: Case resolution fields, a root cause tag, a Knowledge draft for human review, and a sweep of other open Cases with the same cause."
     agent_type: "AgentforceServiceAgent"
-    default_agent_user: "codify.agent@example.com"
+    default_agent_user: "coral_cloud_experience_agent.t5k9pnvabsgu.klkgjtavmk.dt1xvqzygwvk@example.com"
 
 variables:
     case_id: mutable string = ""
@@ -22,7 +22,9 @@ variables:
         description: "Whether a Knowledge draft has already been produced for this recap, so the topic is not run twice."
 
 language:
-    default_locale: "en"
+    # Must be a full locale. A bare "en" is rejected by the Agent Script
+    # compiler with an opaque 422 that names no line.
+    default_locale: "en_US"
     additional_locales: ""
     all_additional_locales: False
 
@@ -265,7 +267,9 @@ subagent draft_article:
                 drafted: boolean
                     label: "Drafted"
                     filter_from_agent: False
-                articleTitle: string
+                # Named draftedArticleTitle on the flow: a Flow variable cannot be
+                # both an input and an output, and articleTitle is already the input.
+                draftedArticleTitle: string
                     label: "Article Title"
                     filter_from_agent: False
                 publishStatus: string

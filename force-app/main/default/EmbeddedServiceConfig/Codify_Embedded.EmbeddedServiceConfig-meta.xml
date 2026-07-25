@@ -23,9 +23,6 @@
     <deploymentFeature>EmbeddedMessaging</deploymentFeature>
     <deploymentType>Web</deploymentType>
     <shouldHideAuthDialog>false</shouldHideAuthDialog>
-    <!-- Deploy EmbeddedServiceConfig before EmbeddedServiceBranding: the two
-         reference each other, so branding cannot land until the config exists. -->
-    <branding>Codify_Branding</branding>
     <isTermsAndConditionsEnabled>false</isTermsAndConditionsEnabled>
     <isTermsAndConditionsRequired>false</isTermsAndConditionsRequired>
 
@@ -37,50 +34,7 @@
       can. Replace this with the ESW site name from your org before deploying;
       see the MIAW setup steps in the README.
     -->
-    <site>ESW_Codify_Placeholder</site>
-
-    <embeddedServiceForms>
-        <displayContext>Conversation</displayContext>
-        <!-- Identity of whoever is logging the fix, so the change log attributes it. -->
-        <embeddedServiceFormFields>
-            <displayOrder>0</displayOrder>
-            <formField>_FirstName</formField>
-            <formFieldType>Text</formFieldType>
-            <isHidden>true</isHidden>
-            <isRequired>false</isRequired>
-            <messagingChannelParameterType
-      >Standard</messagingChannelParameterType>
-        </embeddedServiceFormFields>
-        <embeddedServiceFormFields>
-            <displayOrder>1</displayOrder>
-            <formField>_LastName</formField>
-            <formFieldType>Text</formFieldType>
-            <isHidden>true</isHidden>
-            <isRequired>false</isRequired>
-            <messagingChannelParameterType
-      >Standard</messagingChannelParameterType>
-        </embeddedServiceFormFields>
-        <embeddedServiceFormFields>
-            <displayOrder>2</displayOrder>
-            <formField>_Email</formField>
-            <formFieldType>Email</formFieldType>
-            <isHidden>true</isHidden>
-            <isRequired>false</isRequired>
-            <messagingChannelParameterType
-      >Standard</messagingChannelParameterType>
-        </embeddedServiceFormFields>
-        <!-- Carries the Case subject through so the welcome panel can show it. -->
-        <embeddedServiceFormFields>
-            <displayOrder>3</displayOrder>
-            <formField>_Subject</formField>
-            <formFieldType>Text</formFieldType>
-            <isHidden>true</isHidden>
-            <isRequired>false</isRequired>
-            <messagingChannelParameterType
-      >Standard</messagingChannelParameterType>
-        </embeddedServiceFormFields>
-        <isActive>true</isActive>
-    </embeddedServiceForms>
+    <site>Codify1</site>
 
     <embeddedServiceMessagingChannel>
         <messagingChannel>Codify_MIAW</messagingChannel>

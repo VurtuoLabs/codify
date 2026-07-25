@@ -1,146 +1,134 @@
 <template>
-  <div class="slds-grid slds-gutters slds-wrap slds-p-bottom_small">
-    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
-      <lightning-card>
-        <div class="slds-p-around_medium slds-text-align_center">
-          <div class="slds-text-heading_large">{resolutionsThisWeek}</div>
-          <div class="slds-text-body_small slds-text-color_weak">
-            resolutions logged this week
-          </div>
-        </div>
-      </lightning-card>
-    </div>
-    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
-      <lightning-card>
-        <div class="slds-p-around_medium slds-text-align_center">
-          <div class="slds-text-heading_large">{articlesDrafted}</div>
-          <div class="slds-text-body_small slds-text-color_weak">
-            articles drafted
-          </div>
-        </div>
-      </lightning-card>
-    </div>
-    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
-      <lightning-card>
-        <div class="slds-p-around_medium slds-text-align_center">
-          <div class="slds-text-heading_large">{articlesPending}</div>
-          <div class="slds-text-body_small slds-text-color_weak">
-            awaiting human review
-          </div>
-        </div>
-      </lightning-card>
-    </div>
-    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
-      <lightning-card>
-        <div class="slds-p-around_medium slds-text-align_center">
-          <div class="slds-text-heading_large">{casesFlagged}</div>
-          <div class="slds-text-body_small slds-text-color_weak">
-            related Cases flagged
-          </div>
-        </div>
-      </lightning-card>
-    </div>
-    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
-      <lightning-card>
-        <div class="slds-p-around_medium slds-text-align_center">
-          <div class="slds-text-heading_large">{escalations}</div>
-          <div class="slds-text-body_small slds-text-color_weak">
-            escalated, {escalationHint}
-          </div>
-        </div>
-      </lightning-card>
-    </div>
-  </div>
+  <div class="codify-home">
+    <!-- Headline: what the knowledge base gained, in words, not a bare number. -->
+    <header class="codify-hero">
+      <p class="codify-hero__eyebrow">Codify</p>
+      <h1 class="codify-hero__headline">{headline}</h1>
+      <p class="codify-hero__sub">{subhead}</p>
+    </header>
 
-  <template if:true={error}>
-    <div class="slds-text-color_error slds-p-around_small" role="alert">
-      {error}
-    </div>
-  </template>
+    <template if:true={error}>
+      <div class="slds-text-color_error slds-p-around_small" role="alert">
+        {error}
+      </div>
+    </template>
 
-  <div class="slds-grid slds-gutters slds-wrap">
-    <div
-      class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-bottom_small"
-    >
-      <lightning-card
-        title="Top root causes, last 90 days"
-        icon-name="standard:topic"
-      >
+    <div class="codify-grid">
+      <!-- The funnel is the page. Everything else supports it. -->
+      <section class="codify-panel codify-panel_wide">
+        <h2 class="codify-panel__title">
+          From a spoken fix to published knowledge
+        </h2>
+        <p class="codify-panel__hint">
+          Each bar is measured against every fix ever described, so a stage that
+          loses most of its input looks like it.
+        </p>
+
+        <template if:false={hasData}>
+          <p class="codify-empty">
+            Nothing captured yet. The funnel fills in as technicians describe
+            fixes.
+          </p>
+        </template>
+
+        <template if:true={hasData}>
+          <ul class="codify-funnel">
+            <template for:each={funnel} for:item="stage">
+              <li key={stage.key} class="codify-funnel__row">
+                <div class="codify-funnel__head">
+                  <span class="codify-funnel__label">{stage.label}</span>
+                  <span class="codify-funnel__value">{stage.value}</span>
+                </div>
+                <div class="codify-funnel__track">
+                  <div class={stage.barClass} style={stage.style}></div>
+                  <span class="codify-funnel__pct">{stage.pctLabel}</span>
+                </div>
+                <div class="codify-funnel__foot">
+                  <span class="codify-funnel__note">{stage.note}</span>
+                  <template if:true={stage.showDrop}>
+                    <span class="codify-funnel__drop">{stage.dropLabel}</span>
+                  </template>
+                </div>
+              </li>
+            </template>
+          </ul>
+        </template>
+      </section>
+
+      <!-- Work waiting on a person. Given equal billing on purpose. -->
+      <section class="codify-panel codify-panel_action">
+        <h2 class="codify-panel__title">Waiting on a human</h2>
+
+        <div class="codify-stat">
+          <span class="codify-stat__num">{pendingReview}</span>
+          <span class="codify-stat__label"
+            >drafts to review before they go live</span
+          >
+        </div>
+        <div class="codify-stat">
+          <span class="codify-stat__num codify-stat__num_warn">{untagged}</span>
+          <span class="codify-stat__label"
+            >recaps Codify refused to classify rather than guess</span
+          >
+        </div>
+        <div class="codify-stat">
+          <span class="codify-stat__num">{escalations}</span>
+          <span class="codify-stat__label">escalations raised this week</span>
+        </div>
+
+        <p class="codify-panel__hint codify-panel__hint_tight">
+          A refusal is the system working. A wrong root cause would push the
+          wrong fix onto other people's open cases.
+        </p>
+      </section>
+
+      <!-- Reach: one diagnosis clearing a backlog. -->
+      <section class="codify-panel codify-panel_reach">
+        <h2 class="codify-panel__title">Reach beyond one case</h2>
+        <div class="codify-stat codify-stat_big">
+          <span class="codify-stat__num">{casesFlagged}</span>
+          <span class="codify-stat__label"
+            >other open cases handed a suggested fix this week</span
+          >
+        </div>
+      </section>
+
+      <!-- Recurrence, as a ranked bar list rather than a table. -->
+      <section class="codify-panel">
+        <h2 class="codify-panel__title">What keeps breaking</h2>
+        <p class="codify-panel__hint">Root causes, last 90 days.</p>
+
         <template if:true={hasRootCauses}>
-          <ul class="slds-has-dividers_bottom-space slds-p-horizontal_medium">
+          <ul class="codify-causes">
             <template for:each={topRootCauses} for:item="c">
-              <li
-                key={c.label}
-                class="slds-item slds-grid slds-grid_align-spread"
-              >
-                <span>{c.label}</span>
-                <span class="slds-badge">{c.count}</span>
+              <li key={c.label} class="codify-causes__row">
+                <span class="codify-causes__label">{c.label}</span>
+                <span class="codify-causes__track">
+                  <span class="codify-causes__bar" style={c.style}></span>
+                </span>
+                <span class="codify-causes__count">{c.count}</span>
               </li>
             </template>
           </ul>
         </template>
         <template if:false={hasRootCauses}>
-          <p class="slds-p-around_medium slds-text-color_weak">
-            Nothing tagged yet.
-          </p>
+          <p class="codify-empty">Nothing tagged yet.</p>
         </template>
-      </lightning-card>
-    </div>
+      </section>
 
-    <div
-      class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-bottom_small"
-    >
-      <lightning-card
-        title="Most active technicians this week"
-        icon-name="standard:user"
-      >
-        <template if:true={hasTechnicians}>
-          <ul class="slds-has-dividers_bottom-space slds-p-horizontal_medium">
-            <template for:each={topTechnicians} for:item="t">
-              <li
-                key={t.label}
-                class="slds-item slds-grid slds-grid_align-spread"
-              >
-                <span>{t.label}</span>
-                <span class="slds-badge">{t.count}</span>
-              </li>
-            </template>
-          </ul>
-        </template>
-        <template if:false={hasTechnicians}>
-          <p class="slds-p-around_medium slds-text-color_weak">
-            No activity this week yet.
-          </p>
-        </template>
-      </lightning-card>
+      <!-- Cadence, as a compact column chart. -->
+      <section class="codify-panel">
+        <h2 class="codify-panel__title">Capture cadence</h2>
+        <p class="codify-panel__hint">Fixes described, last 7 days.</p>
+        <div class="codify-spark">
+          <template for:each={trend} for:item="t">
+            <div key={t.key} class="codify-spark__col" title={t.label}>
+              <div class="codify-spark__fill" style={t.style}></div>
+              <span class="codify-spark__count">{t.count}</span>
+            </div>
+          </template>
+        </div>
+      </section>
     </div>
   </div>
-
-  <lightning-card
-    title="Resolutions logged, last 7 days"
-    icon-name="standard:metrics"
-  >
-    <div class="slds-p-horizontal_medium slds-p-bottom_medium">
-      <template for:each={trend} for:item="t">
-        <div
-          key={t.key}
-          class="slds-grid slds-grid_vertical-align-center slds-p-vertical_xxx-small"
-        >
-          <div
-            class="slds-size_1-of-4 slds-text-body_small slds-text-color_weak"
-          >
-            {t.label}
-          </div>
-          <div
-            class="slds-size_3-of-4 slds-grid slds-grid_vertical-align-center"
-          >
-            <div class="codify-bar" style={t.style}></div>
-            <span class="slds-p-left_x-small slds-text-body_small"
-              >{t.count}</span
-            >
-          </div>
-        </div>
-      </template>
-    </div>
-  </lightning-card>
 </template>

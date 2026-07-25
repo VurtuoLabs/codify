@@ -130,13 +130,13 @@ A Lightning app for service ops and Knowledge owners, separate from the MIAW win
 
 **Apex (17 classes)** — `Codify_Constants`, `Codify_Util`, `Codify_ResolutionParse` (DTO), `Codify_ExtractionService` (the only place a recap is interpreted), `Codify_ChangeLogService` (the audit backbone); five invocables (`LogResolution`, `TagRootCause`, `DraftArticle`, `RelatedCaseSweep`, `EscalateForReview`); three LWC controllers; `Codify_TestUtil` and three test classes.
 
-**Flows (5, autolaunched)** — `Codify_Log_Resolution`, `Codify_Tag_Root_Cause`, `Codify_Draft_Knowledge_Article`, `Codify_Related_Case_Sweep`, `Codify_Escalate_For_Review`. Each wraps one invocable and maps its outputs for the agent.
+**Flows (6)** — five autolaunched (`Codify_Log_Resolution`, `Codify_Tag_Root_Cause`, `Codify_Draft_Knowledge_Article`, `Codify_Related_Case_Sweep`, `Codify_Escalate_For_Review`), each wrapping one invocable and mapping its outputs for the agent; plus `Codify_Route_To_Agent`, the Omni-Channel routing flow that hands an incoming messaging session to the agent.
 
 **LWCs (5)** — the four in the brief plus `codifyRootCauseTrends`, which backs the required Root Cause Trends tab.
 
 **Agent** — `Codify_Agent`, an `AiAuthoringBundle` of type `AgentforceServiceAgent` with a router and six subagents.
 
-**MIAW** — `Codify_MIAW` messaging channel, `Codify_Embedded` deployment, `Codify_Branding`, `Codify_Support_Ops` queue.
+**MIAW** — `Codify_MIAW` messaging channel, `Codify_Embedded` deployment, `Codify_Route_To_Agent` routing flow, `Codify_Support_Ops` queue. No `EmbeddedServiceBranding`: that type is not valid for `EmbeddedMessaging` deployments, so the theming lives in `experience-site/head-markup.html`.
 
 **Permission sets** — `Codify_Agent_User` (the MIAW running user; no delete on audit objects, no Knowledge publish right) and `Codify_Reviewer` (service ops and Knowledge owners; read-only on the change log).
 
@@ -215,7 +215,6 @@ codify/
 │   ├── aiAuthoringBundles/Codify_Agent/     # the MIAW service agent
 │   ├── classes/                             # 17 Apex classes
 │   ├── customMetadata/                      # 14 root cause taxonomy rows
-│   ├── EmbeddedServiceBranding/             # platform chrome colours
 │   ├── EmbeddedServiceConfig/               # the embedded deployment
 │   ├── flexipages/ tabs/ applications/      # the Codify app surface
 │   ├── flows/                               # 5 autolaunched flows
@@ -232,26 +231,32 @@ codify/
 
 ## Status and known environment notes
 
-Codify is **deployed and green** in `test-81e-dev-ed.develop.my.salesforce.com`:
+Codify is **deployed, published and running** in `test-81e-dev-ed.develop.my.salesforce.com`:
 
-| Check                 | Result                                                                                                                                                                               |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Metadata deploy       | All components clean — 17 Apex classes, 5 flows, 5 LWCs, 56 object components, 14 taxonomy rows, tabs, flexipages, app, both permission sets, messaging channel, queue, agent bundle |
-| Apex tests            | **46/46 pass**, 94% coverage across the Codify classes (85–100% per class)                                                                                                           |
-| End-to-end smoke test | One recap produced a tagged Case, a Knowledge **Draft**, a suggestion on a sibling Case, and 5 audit rows — one per action                                                           |
+| Check                 | Result                                                                                                                                                                                      |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Metadata deploy       | All components clean — 17 Apex classes, 5 flows, 5 LWCs, 56 object components, 14 taxonomy rows, tabs, flexipages, app, both permission sets, messaging channel, queue, embedded deployment |
+| Apex tests            | **46/46 pass**, 94% coverage across the Codify classes (85–100% per class)                                                                                                                  |
+| Agent                 | `Codify_Agent` compiles, is **published and activated** as a Service Agent (`ExternalCopilot`)                                                                                              |
+| Embedded deployment   | `Codify_Embedded` live on the `Codify` Experience site, wired to the `Codify_MIAW` channel                                                                                                  |
+| End-to-end smoke test | One recap produced a tagged Case, a Knowledge **Draft**, a suggestion on a sibling Case, and 5 audit rows — one per action                                                                  |
 
-The smoke-test records were removed afterwards, so the org holds the app and the taxonomy but no sample data.
+Smoke-test records were removed afterwards, so the org holds the app and taxonomy but no sample data.
 
-### Things worth knowing
+### Six bugs only a real deploy would have caught
 
-**Two bugs that only a real deploy would have caught**, both now fixed in this repo:
+All fixed here. Each failed with an error that pointed nowhere near its cause, which is the reason they are written down.
 
-1. **Custom metadata records need `xmlns:xsd` declared.** The files use `xsi:type="xsd:string"` on every value. With the `xsd` prefix undeclared the Metadata API rejects the whole deploy with a bare `UNKNOWN_EXCEPTION` and no component detail — a record with _no_ values validates fine, which is what makes it hard to spot. Note that [Scribe](../scribe) has the same latent issue in its `Scribe_Stage_Requirement` records.
-2. **Prettier corrupts `<flow>` elements.** `prettier-plugin-xml` hands the content of a `<flow>` tag to its JavaScript-Flow parser, which appends a stray `;` and reflows the value, silently breaking `flowAccesses` in permission sets. `**/permissionsets/**` is therefore excluded in `.prettierignore` and those files are formatted by hand.
+1. **Custom metadata needs `xmlns:xsd` declared.** Every value uses `xsi:type="xsd:string"`; with the prefix undeclared the Metadata API rejects the deploy with a bare `UNKNOWN_EXCEPTION` and no component detail. A record with _no_ values validates cleanly, which is what makes it hard to spot. [Scribe](../scribe) has the same latent issue.
+2. **Prettier corrupts `<flow>` elements.** `prettier-plugin-xml` hands their content to its JavaScript-Flow parser, which appends a stray `;` and reflows the value — silently breaking `flowAccesses`. `**/permissionsets/**` is excluded in `.prettierignore` and those files are formatted by hand.
+3. **Agent Script needs a full locale.** `default_locale: "en"` is rejected by the compiler with a 422 that names no line or field; it must be `"en_US"`. Scribe carries the same value, which is why its bundle fails to compile too.
+4. **Agent action outputs must match their Flow variable names exactly.** A Flow variable cannot be both an input and an output, so `Codify_Draft_Knowledge_Article` renames its output to `draftedArticleTitle` — and the agent must declare that name, not `articleTitle`. The mismatch only surfaces on save, as a Generative AI Function Definition error.
+5. **A messaging channel with a Queue session handler never reaches the agent.** The window opens, the message shows "Sent", and nothing answers, because queue routing waits for a _human_ to accept the work. Handing a session to an Agentforce agent requires a `RoutingFlow` calling `routeWork` with `routingType: Bot` — `Codify_Route_To_Agent`. The queue remains only as `routeWork`'s fallback.
+6. **The Experience Cloud head markup has to be scoped to the messaging widget.** It runs in the `<head>` of the whole site, so a stylesheet containing `html, body` and `p, span, div` — perfectly safe inside a shadow root, which is self-scoping — repaints the entire portal when injected at page level. The page-level rules are now prefixed with the widget root, and the shadow walk starts from the widget rather than `document`.
 
-**Still requires Setup, and cannot be source-controlled.** The `<site>` value in `Codify_Embedded.EmbeddedServiceConfig-meta.xml` is a **placeholder**. Every embedded messaging deployment needs its own ESW site, which only Setup can create and which cannot be shared between deployments. The messaging channel and queue deploy fine; the deployment config needs that one value swapped first. See [`experience-site/README.md`](experience-site/README.md).
+### Org-specific by nature
 
-**`sf agent validate authoring-bundle` returns 422** in the Enterprise org it was tried in — equally for Scribe's known-good bundle, so the Agent Script compile endpoint is unavailable there rather than the script being invalid. The bundle deploys and publishes normally.
+The `<site>` on `Codify_Embedded` points at the `Codify` Experience site in this org. A CustomSite can back exactly one embedded deployment, so this value must change per org. See [`experience-site/README.md`](experience-site/README.md), which also explains why the deployment deliberately has no pre-chat form and no `EmbeddedServiceBranding`.
 
 ## License
 

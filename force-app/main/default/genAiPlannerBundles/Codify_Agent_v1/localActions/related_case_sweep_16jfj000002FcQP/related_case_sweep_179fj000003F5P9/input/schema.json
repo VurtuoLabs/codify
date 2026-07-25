@@ -1,0 +1,28 @@
+{
+  "required" : [ "resolutionLogId" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "caseId" : {
+      "title" : "Case Id",
+      "description" : "Case Id",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "includeRelated" : {
+      "title" : "Include Related Causes",
+      "description" : "Whether to include closely related causes as well as exact matches.",
+      "lightning:type" : "lightning__booleanType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "resolutionLogId" : {
+      "title" : "Resolution Log Id",
+      "description" : "Resolution Log Id",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}
