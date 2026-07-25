@@ -134,7 +134,14 @@ A Lightning app for service ops and Knowledge owners, separate from the MIAW win
 
 **LWCs (5)** — the four in the brief plus `codifyRootCauseTrends`, which backs the required Root Cause Trends tab.
 
-**Agent** — `Codify_Agent`, an `AiAuthoringBundle` of type `AgentforceServiceAgent` with a router and six subagents.
+**Agents** — two `AiAuthoringBundle`s sharing the same five topics and the same five flows:
+
+| Bundle                  | Type                                          | Surface                       | Notes                                                      |
+| ----------------------- | --------------------------------------------- | ----------------------------- | ---------------------------------------------------------- |
+| `Codify_Agent`          | `AgentforceServiceAgent` (`ExternalCopilot`)  | MIAW / Experience Cloud       | Needs `default_agent_user`; blocked on the ESW site below. |
+| `Codify_Employee_Agent` | `AgentforceEmployeeAgent` (`InternalCopilot`) | Agentforce, inside Salesforce | Runs as the logged-in user.                                |
+
+The employee agent must **not** carry `default_agent_user` — publish fails if the line is present. It also records `Internal Agent Console` as the source channel rather than `MIAW`, and takes the Case from the record it was opened on instead of a pre-chat form.
 
 **MIAW** — `Codify_MIAW` messaging channel, `Codify_Embedded` deployment, `Codify_Route_To_Agent` routing flow, `Codify_Support_Ops` queue. No `EmbeddedServiceBranding`: that type is not valid for `EmbeddedMessaging` deployments, so the theming lives in `experience-site/head-markup.html`.
 

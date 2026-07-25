@@ -1,0 +1,35 @@
+{
+  "required" : [ "caseId" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "caseId" : {
+      "title" : "Case Id",
+      "description" : "Case Id",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "resolutionLogId" : {
+      "title" : "Resolution Log Id",
+      "description" : "Resolution Log Id",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "resolutionRecap" : {
+      "title" : "Resolution Recap",
+      "description" : "Used only when there is no resolution log to read from.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "rootCauseKey" : {
+      "title" : "Root Cause Key",
+      "description" : "The standard category the technician named, when they named one.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}
