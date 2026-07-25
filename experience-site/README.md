@@ -92,6 +92,52 @@ Chat, Flow and Appointment Management deployments; applying it to an
 Management feature…"_. MIAW theming therefore lives entirely in
 `head-markup.html` plus the deployment's own settings in Setup.
 
+## Two things that must be done in Setup
+
+Neither is reachable from the Metadata API, and both were verified against this
+org rather than assumed.
+
+### 1. The deployment has to be published, or no widget appears at all
+
+If nothing shows in the bottom corner, check this first — it is not a styling or
+placement problem. Ask the config endpoint directly:
+
+```
+curl "https://<myDomain>.my.salesforce-scrt.com/embeddedservice/v1/embedded-service-config?orgId=<orgId>&esConfigName=Codify_Embedded&language=en_US"
+```
+
+- `HTTP 412 {"text":"Embedded Messaging Config is not Published"}` — the
+  deployment exists but has never been published. **Setup → Embedded Service
+  Deployments → Codify → Publish.**
+- `HTTP 200` with a JSON body — published, and the widget should render.
+
+A working deployment's response also shows `siteUrl` pointing at its own
+dedicated `ESW_…` site. `Codify_Embedded` currently points at an ordinary
+Experience site because a fresh ESW site cannot be minted from source, so if
+publishing does not resolve it, recreate the deployment through the Setup wizard
+and let it mint its own site.
+
+### 2. The script has to be pasted into Edit Head Markup
+
+`head-markup.html` cannot be deployed through the site bundle. The per-view
+`customHeadTags` attribute on `community_builder:seoAssistant` is the only head
+field the bundle exposes, and it is `link`/`meta` only in practice — tested
+against this org:
+
+| Value                                  | Result   |
+| -------------------------------------- | -------- |
+| `<link rel="stylesheet" href="…">`     | deploys  |
+| `<script>…inline…</script>`            | rejected |
+| `<script src="/sfsites/c/resource/…">` | rejected |
+
+Both script forms fail with _"The customHeadTags field can only contain link,
+meta, script tags, and valid tag attributes"_ despite the message naming script
+tags, which points at the site's CSP posture rather than the field itself.
+
+So the script goes where it always did: **Experience Builder → Settings →
+Advanced → Edit Head Markup**. That field accepts inline script and is not
+represented in `DigitalExperienceBundle`, so it stays a manual step.
+
 ## The host-page contract
 
 Codify's window and the page hosting it talk over `postMessage`. This is what
