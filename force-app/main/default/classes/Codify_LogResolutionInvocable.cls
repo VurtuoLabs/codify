@@ -30,13 +30,13 @@ public with sharing class Codify_LogResolutionInvocable {
 
     @InvocableVariable(
       label='Technician User Id'
-      description='Who described the fix. Defaults to the running user, which for MIAW is the mapped portal or partner user.'
+      description='Who described the fix. Defaults to the running user.'
     )
     public String technicianUserId;
 
     @InvocableVariable(
       label='Source Channel'
-      description='MIAW, Experience Cloud, Internal Agent Console, or Dictation. Defaults to MIAW.'
+      description='Internal Agent Console or Dictation. Defaults to Internal Agent Console.'
     )
     public String sourceChannel;
 
@@ -110,7 +110,7 @@ public with sharing class Codify_LogResolutionInvocable {
         : 0,
       Logged_By_Technician__c = technicianId,
       Source_Channel__c = String.isBlank(req.sourceChannel)
-        ? 'MIAW'
+        ? 'Internal Agent Console'
         : req.sourceChannel,
       Low_Confidence__c = parse.lowConfidence,
       Article_Drafted__c = false,

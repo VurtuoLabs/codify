@@ -9,5 +9,5 @@
     <required>false</required>
     <deleteConstraint>SetNull</deleteConstraint>
     <description
-  >Who described the fix. For MIAW sessions this is the mapped portal or partner user.</description>
+  >Who described the fix. The agent runs as the logged-in user, so this is whoever was talking to Codify.</description>
 </CustomField>

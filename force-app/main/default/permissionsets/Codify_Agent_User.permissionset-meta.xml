@@ -2,7 +2,7 @@
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <label>Codify Agent User</label>
     <description
-  >For the MIAW-connected running user: write access to Case resolution fields, Resolution Log, Change Log and Knowledge drafts. Excludes delete on the audit objects and any Knowledge publish right, so the review queue cannot be bypassed.</description>
+  >For users who talk to Codify: write access to Case resolution fields, Resolution Log, Change Log and Knowledge drafts. Excludes delete on the audit objects and any Knowledge publish right, so the review queue cannot be bypassed.</description>
     <hasActivationRequired>false</hasActivationRequired>
 
     <classAccesses><apexClass>Codify_Constants</apexClass><enabled

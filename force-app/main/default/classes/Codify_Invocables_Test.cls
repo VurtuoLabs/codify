@@ -138,7 +138,7 @@ private class Codify_Invocables_Test {
     Codify_TestUtil.stubTaxonomy();
     Codify_LogResolutionInvocable.Request req = new Codify_LogResolutionInvocable.Request();
     req.resolutionRecap = Codify_TestUtil.RICH_RECAP;
-    req.sourceChannel = 'Experience Cloud';
+    req.sourceChannel = 'Dictation';
 
     Test.startTest();
     Codify_LogResolutionInvocable.Response r = Codify_LogResolutionInvocable.run(
@@ -156,7 +156,7 @@ private class Codify_Invocables_Test {
       LIMIT 1
     ];
     Assert.areEqual(
-      'Experience Cloud',
+      'Dictation',
       log.Source_Channel__c,
       'The channel should be recorded.'
     );

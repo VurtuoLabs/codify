@@ -29,13 +29,27 @@ Integer target = drafts.size() / 2;
 Integer published = 0;
 for (Integer i = 0; i < drafts.size() && published < target; i++) {
   try {
-    KbManagement.PublishingService.publishArticle(drafts[i].KnowledgeArticleId, true);
+    KbManagement.PublishingService.publishArticle(
+      drafts[i].KnowledgeArticleId,
+      true
+    );
     published++;
   } catch (Exception e) {
-    System.debug(LoggingLevel.WARN, 'SEED: could not publish ' + drafts[i].Title + ' :: ' + e.getMessage());
+    System.debug(
+      LoggingLevel.WARN,
+      'SEED: could not publish ' + drafts[i].Title + ' :: ' + e.getMessage()
+    );
   }
 }
-System.debug('SEED: published=' + published + ' of ' + drafts.size() + ' drafts, ' + (drafts.size() - published) + ' left for review');
+System.debug(
+  'SEED: published=' +
+    published +
+    ' of ' +
+    drafts.size() +
+    ' drafts, ' +
+    (drafts.size() - published) +
+    ' left for review'
+);
 
 // ── Sweep from the best-corroborated resolutions ────────────────────────────
 // Picks the highest-confidence tagged logs, which is what a technician would
@@ -58,7 +72,11 @@ for (Codify_Resolution_Log__c log : sweepFrom) {
 
 Integer flagged = 0;
 if (!sweeps.isEmpty()) {
-  for (Codify_RelatedCaseSweepInvocable.Response r : Codify_RelatedCaseSweepInvocable.run(sweeps)) {
+  for (
+    Codify_RelatedCaseSweepInvocable.Response r : Codify_RelatedCaseSweepInvocable.run(
+      sweeps
+    )
+  ) {
     if (r.casesFlagged != null) {
       flagged += r.casesFlagged;
     }
@@ -70,7 +88,10 @@ System.debug('SEED: related cases flagged=' + flagged);
 List<Case> toClose = [
   SELECT Id
   FROM Case
-  WHERE Codify_Resolved_Via_Codify__c = TRUE AND IsClosed = FALSE AND Subject LIKE :(SEED_TAG + '%')
+  WHERE
+    Codify_Resolved_Via_Codify__c = TRUE
+    AND IsClosed = FALSE
+    AND Subject LIKE :(SEED_TAG + '%')
   LIMIT 12
 ];
 for (Case c : toClose) {

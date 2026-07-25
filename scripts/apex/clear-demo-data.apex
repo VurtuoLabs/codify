@@ -29,18 +29,28 @@ for (Knowledge__kav k : [
       // A live article cannot be deleted outright. editOnlineArticle with
       // unpublish=true takes it offline and leaves a draft behind, which is
       // then deletable. (There is no unpublishArticle method.)
-      KbManagement.PublishingService.editOnlineArticle(k.KnowledgeArticleId, true);
+      KbManagement.PublishingService.editOnlineArticle(
+        k.KnowledgeArticleId,
+        true
+      );
     }
     KbManagement.PublishingService.deleteDraftArticle(k.KnowledgeArticleId);
     removedArticles++;
   } catch (Exception e) {
-    System.debug(LoggingLevel.WARN, 'CLEAR: could not remove article ' + k.Id + ' :: ' + e.getMessage());
+    System.debug(
+      LoggingLevel.WARN,
+      'CLEAR: could not remove article ' + k.Id + ' :: ' + e.getMessage()
+    );
   }
 }
 System.debug('CLEAR: articles removed=' + removedArticles);
 
 // ── Tasks raised by escalation ──────────────────────────────────────────────
-List<Task> tasks = [SELECT Id FROM Task WHERE Subject LIKE 'Codify: resolution needs a human review%'];
+List<Task> tasks = [
+  SELECT Id
+  FROM Task
+  WHERE Subject LIKE 'Codify: resolution needs a human review%'
+];
 delete tasks;
 System.debug('CLEAR: tasks=' + tasks.size());
 
