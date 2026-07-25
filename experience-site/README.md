@@ -97,25 +97,52 @@ Management feature…"_. MIAW theming therefore lives entirely in
 Neither is reachable from the Metadata API, and both were verified against this
 org rather than assumed.
 
-### 1. The deployment has to be published, or no widget appears at all
+### 1. The deployment needs its own ESW site, and Setup is the only thing that makes one
 
-If nothing shows in the bottom corner, check this first — it is not a styling or
-placement problem. Ask the config endpoint directly:
+This is the cause of "no chat button in the corner", and of Setup failing to
+switch the CWC version with _"Failed to update CWC version: Your site properties
+didn't update."_ Both are the same underlying problem.
+
+Compare the two deployments in this org:
+
+| Deployment           | `site`                                  | Config endpoint |
+| -------------------- | --------------------------------------- | --------------- |
+| `ESA_Web_Deployment` | `ESW_ESA_Web_Deployment_17248009206571` | HTTP 200        |
+| `Codify_Embedded`    | an ordinary Experience site             | HTTP 412        |
+
+An embedded messaging deployment must point at a **dedicated ESW site**. Pointing
+it at a normal Experience site deploys cleanly and then fails silently
+afterwards: the deployment can never be published, so its config stays on
 
 ```
-curl "https://<myDomain>.my.salesforce-scrt.com/embeddedservice/v1/embedded-service-config?orgId=<orgId>&esConfigName=Codify_Embedded&language=en_US"
+HTTP 412 {"text":"Embedded Messaging Config is not Published"}
 ```
 
-- `HTTP 412 {"text":"Embedded Messaging Config is not Published"}` — the
-  deployment exists but has never been published. **Setup → Embedded Service
-  Deployments → Codify → Publish.**
-- `HTTP 200` with a JSON body — published, and the widget should render.
+and the bootstrap renders nothing, because it fetches that config before drawing
+the button.
 
-A working deployment's response also shows `siteUrl` pointing at its own
-dedicated `ESW_…` site. `Codify_Embedded` currently points at an ordinary
-Experience site because a fresh ESW site cannot be minted from source, so if
-publishing does not resolve it, recreate the deployment through the Setup wizard
-and let it mint its own site.
+**This cannot be bootstrapped from source.** ESW sites are minted only by the
+Setup wizard. The Tooling API rejects a deployment created without one
+(`REQUIRED_FIELD_MISSING: SiteId`) and will not mint it, and publishing the
+Experience _sites_ does not help — that is a different publish (verified: both
+site publishes completed while the config stayed 412).
+
+To fix:
+
+1. **Setup → Embedded Service Deployments → New → Messaging for In-App and Web.**
+   Point it at the **Codify** messaging channel. This mints an `ESW_…` site.
+2. **Publish** the deployment from the same screen.
+3. Confirm it is live:
+   ```
+   curl "https://<myDomain>.my.salesforce-scrt.com/embeddedservice/v1/embedded-service-config?orgId=<orgId>&esConfigName=<deploymentName>&language=en_US"
+   ```
+   Expect HTTP 200 and a `siteUrl` pointing at the new ESW site.
+4. Copy the generated site name into `<site>` in
+   `Codify_Embedded.EmbeddedServiceConfig-meta.xml`, replacing the placeholder,
+   so source matches the org.
+5. Point the page at it by setting `deploymentName` on the
+   `experience_messaging:embeddedMessaging` component in the site bundle, then
+   deploying that view — no Experience Builder needed for this step.
 
 ### 2. The script has to be pasted into Edit Head Markup
 
