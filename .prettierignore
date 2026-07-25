@@ -18,3 +18,7 @@ coverage/
 # of the published version, but not hand-edited, so not formatted.
 **/genAiPlannerBundles/**
 **/bots/**
+
+# Retrieved Experience Cloud metadata. Kept byte-for-byte as the org returned it
+# so re-retrieves produce clean diffs rather than formatting churn.
+**/digitalExperiences/**
