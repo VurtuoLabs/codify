@@ -124,30 +124,33 @@ prompt in the first couple of seconds would otherwise have it fired into a windo
 that is not yet listening, and it would vanish with no feedback. The window holds
 that utterance and releases it when `INPUT_ON` arrives.
 
-## Theming
+## Theming, and where this file goes
 
-`head-markup.html` restyles what lives _inside_ the messaging widget's nested
-shadow roots, which a page-level stylesheet cannot reach; it injects an adopted
-stylesheet into each one.
+`head-markup.html` styles the widget's interior by injecting an adopted
+stylesheet into each of its nested shadow roots, which a page-level stylesheet
+cannot reach.
 
-**Everything is scoped to the widget.** This file runs in the `<head>` of the
-whole Experience Cloud site, so an unscoped version restyles the entire portal:
-rules like `html, body` and `p, span, div` are harmless inside a shadow root,
-which is self-scoping, and destructive outside one. Two things enforce the scope,
-and both matter if you extend this file:
+**The same file behaves differently depending on which head markup you paste it
+into, and it detects which.** This is the thing that bit us:
 
-- the page-level `<style>` contains only rules prefixed with the widget root, and
-- the shadow-root walk and `queryDeep` start from `messagingRoots()`, never from
-  `document`.
+| Pasted into                             | What the document is | What the script does                                              |
+| --------------------------------------- | -------------------- | ----------------------------------------------------------------- |
+| The **ESW site** serving the chat frame | The agent UI itself  | Applies the full stylesheet globally — `html, body` _is_ the chat |
+| The **host Experience site**            | Your portal page     | Confines everything to the embedded messaging component           |
 
-If the widget's markup changes in a future release, add the new container
-selector to `ROOT_SELECTORS` rather than widening any selector.
+The original VenueNation version was written for the first case, which is why it
+styles `html, body` and `p, span, div` unconditionally and calls
+`window.parent.postMessage`: it runs inside the chat frame. Dropped into a portal
+page unchanged, those same rules repaint the entire site.
 
-Because `EmbeddedServiceBranding` is unavailable for MIAW (see above), the head
-markup is the single source of truth for the look. The one palette to edit is the
-`BRAND` object at the top of the script; every rule below it is built from those
-values, so changing `BRAND.accent` retints the launcher, the technician's message
-bubbles and the panel buttons together.
+`isAgentDocument()` decides which context it is in, and `styleRoots()` returns
+either `[document]` or just the widget. On this org the embedded deployment's
+`<site>` is the Codify Experience site itself, so the markup runs in _both_
+places — the portal page and the chat frame — and the detection is what keeps the
+portal intact while still theming the conversation.
+
+If Salesforce changes the widget's markup, add the new container selector to
+`ROOT_SELECTORS` rather than widening any CSS selector.
 
 ## Why it looks different from the VenueNation concierge
 

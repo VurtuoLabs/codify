@@ -71,24 +71,35 @@
 
     // ── SCOPE ────────────────────────────────────────────────────────────
     /**
-     * Everything below is confined to the embedded messaging widget. This file
-     * runs in the <head> of the whole Experience Cloud site, so an unscoped
-     * stylesheet (or an unscoped shadow-root walk) restyles the entire portal,
-     * not just Codify. Rules like "html, body" and "p, span, div" are safe
-     * INSIDE a shadow root, which is self-scoping, and ruinous outside one.
+     * Where this file is pasted decides how it must behave, and getting that
+     * wrong is what breaks the portal.
      *
-     * These selectors cover the launcher and the conversation across the
-     * embedded messaging versions; unknown ones simply match nothing.
+     * Pasted into the ESW site's head markup, the script runs INSIDE the chat
+     * iframe. There, the document *is* the agent UI, so blanket rules like
+     * "html, body" and "p, span, div" are exactly right — that is the context
+     * the original VenueNation version was written for, which is why it calls
+     * window.parent.postMessage.
+     *
+     * Pasted into the host Experience site's head markup, the same script runs
+     * on the portal page, where those same rules repaint the whole site. There
+     * the styling has to be confined to the embedded messaging component.
+     *
+     * So the script detects which document it is in and scopes accordingly,
+     * rather than assuming either one.
      */
     var ROOT_SELECTORS = [
+      // The Experience Builder component that hosts the widget on the page.
+      "experience_messaging-embedded-messaging",
+      "[data-component-id*='embeddedMessaging']",
+      // Containers the embedded messaging bootstrap injects.
       "#embeddedMessagingFrame",
       ".embeddedMessagingFrame",
       "#embedded-messaging",
       ".embedded-messaging",
-      "embeddedservice-chat",
-      "embeddedservice-messaging",
+      "#embeddedMessagingConversationButton",
       ".embeddedMessagingConversation",
-      "#embeddedMessagingConversationButton"
+      "embeddedservice-chat",
+      "embeddedservice-messaging"
     ];
 
     /** The widget's root elements on this page, if it has rendered yet. */
@@ -103,6 +114,34 @@
         }
       }
       return out;
+    }
+
+    /**
+     * True when this document is the agent UI itself rather than a page hosting
+     * it — i.e. the chat's own iframe. Detected by the chat's own furniture
+     * being present at document level with no widget container wrapping it.
+     */
+    var _ownDoc = null;
+    function isAgentDocument() {
+      if (_ownDoc !== null) return _ownDoc;
+      try {
+        var hasChatChrome = !!document.querySelector(
+          ".chat-container, .chat-message-panel, .assistant-panel, .chat-fab-container, .slds-chat"
+        );
+        _ownDoc = hasChatChrome && messagingRoots().length === 0;
+      } catch (e) {
+        _ownDoc = false;
+      }
+      return _ownDoc;
+    }
+
+    /**
+     * The roots to style. Inside the chat's own document that is the document,
+     * restoring the original behaviour verbatim; on a host page it is only the
+     * widget.
+     */
+    function styleRoots() {
+      return isAgentDocument() ? [document] : messagingRoots();
     }
 
     // ── DARK MODE ────────────────────────────────────────────────────────
@@ -317,30 +356,19 @@
           /* skip inaccessible subtree */
         }
       }
-      // Confined to the widget for the same reason as the stylesheet: a
-      // document-wide walk would match, and restyle, portal elements.
-      messagingRoots().forEach(walk);
+      // Same scope as the styling: the whole document inside the chat's own
+      // frame, only the widget when hosted on a portal page.
+      styleRoots().forEach(walk);
       return out;
     }
 
     /**
-     * The only rules that belong in the page's own stylesheet: the widget's
-     * outer box. Every selector is prefixed with the widget root, so nothing
-     * here can reach the portal around it. The conversation's interior is
-     * handled by shadow-root injection instead, where the rules are naturally
-     * scoped.
+     * Scoped fallback for a host page: only the widget's own box, never the
+     * portal around it. Unused inside the chat's own document, where the full
+     * stylesheet applies directly.
      */
     var SCOPED_PAGE_CSS = ROOT_SELECTORS.map(function (r) {
-      return (
-        r +
-        ", " +
-        r +
-        " * { --lwc-brandPrimary: " +
-        BRAND.accent +
-        " !important; }\n" +
-        r +
-        " { color-scheme: dark; }"
-      );
+      return r + " { color-scheme: dark; }";
     }).join("\n");
 
     function applyDarkMode() {
@@ -348,15 +376,17 @@
       if (!s) {
         s = document.createElement("style");
         s.id = "codify-dark-root";
-        s.textContent = SCOPED_PAGE_CSS;
+        // Inside the chat's own document the blanket rules ARE the styling and
+        // there is nothing else on the page to damage. On a host page only the
+        // scoped rules go in, and the widget's interior is reached through its
+        // shadow roots below, where selectors are self-scoping anyway.
+        s.textContent = isAgentDocument() ? DARK_CSS : SCOPED_PAGE_CSS;
         document.head.appendChild(s);
       }
-      // Walk only the widget's subtree. Walking `document` reaches every LWC on
-      // the portal and repaints the lot.
-      messagingRoots().forEach(function (root) {
+
+      styleRoots().forEach(function (root) {
         if (root.shadowRoot) {
           injectDarkIntoShadow(root.shadowRoot);
-          walkAndInjectDark(root.shadowRoot);
         }
         walkAndInjectDark(root);
       });
@@ -881,7 +911,21 @@
           ensureBackdrop();
           injectStarterPanel();
           break;
+        // Hide the composer while a panel is covering the conversation, so the
+        // technician cannot type into a chat they cannot see.
+        case "CODIFY_INPUT_OFF":
+          queryDeep(".assistant-panel-input, .chat-container").forEach(
+            function (el) {
+              el.style.display = "none";
+            }
+          );
+          break;
         case "CODIFY_INPUT_ON":
+          queryDeep(".assistant-panel-input, .chat-container").forEach(
+            function (el) {
+              el.style.display = "";
+            }
+          );
           agentReady = true;
           pushCaseContext();
           if (pendingUtterance) {
