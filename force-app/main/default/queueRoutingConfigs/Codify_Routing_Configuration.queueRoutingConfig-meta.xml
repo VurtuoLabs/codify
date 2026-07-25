@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Makes Codify_Support_Ops an Omni-Channel queue.
+
+  Without a routing configuration a queue is just a group of users, and
+  routeWork rejects it: "The referenced fallback queue must be an Omni-Channel
+  queue. This Route Work invocable action did not create a valid Pending Service
+  Routing." The whole routing flow then fails, so nothing reaches the agent.
+
+  Modelled on the org's working ESA Routing Configuration.
+-->
+<QueueRoutingConfig xmlns="http://soap.sforce.com/2006/04/metadata">
+    <capacityType>INHERITED</capacityType>
+    <capacityWeight>2.0</capacityWeight>
+    <isAttributeBased>false</isAttributeBased>
+    <label>Codify Routing Configuration</label>
+    <routingModel>MOST_AVAILABLE</routingModel>
+    <routingPriority>1</routingPriority>
+</QueueRoutingConfig>
