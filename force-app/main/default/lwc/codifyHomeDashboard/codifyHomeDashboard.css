@@ -1,10 +1,10 @@
 /*
   Codify Home.
 
-  Intentionally not the standard lightning-card grid every other app home uses.
-  The page is built from a dark hero band and flat panels so it reads as its own
-  surface, and so the funnel — the argument the product actually makes — gets the
-  full width rather than being one tile among six.
+  One card treatment, used for every measure on the page. The grid is
+  align-items:start so a card sizes to its content instead of stretching to match
+  its tallest neighbour — that stretching was leaving large dead areas inside the
+  shorter cards.
 
   Colours come from SLDS styling hooks with literal fallbacks, so the page still
   holds up in an org that has themed its hooks differently.
@@ -19,10 +19,13 @@
   --codify-ink: #0b0f14;
   --codify-accent: #0176d3;
   --codify-accent-soft: #5eb0ff;
+  --codify-deep: #04487f;
   --codify-warn: #fe9339;
+  --codify-good: #2e844a;
   --codify-line: var(--slds-g-color-border-base-1, #e5e5e5);
   --codify-surface: var(--slds-g-color-neutral-base-100, #fff);
   --codify-muted: var(--slds-g-color-neutral-base-40, #5c5c5c);
+  --codify-track: var(--slds-g-color-neutral-base-95, #f3f3f3);
   padding-bottom: 1rem;
 }
 
@@ -30,7 +33,7 @@
 .codify-hero {
   background: var(--codify-ink);
   color: #fff;
-  padding: 2rem 2rem 2.25rem;
+  padding: 1.75rem 2rem 2rem;
   border-radius: 0 0 var(--slds-g-radius-border-4, 1rem)
     var(--slds-g-radius-border-4, 1rem);
 }
@@ -46,7 +49,7 @@
 
 .codify-hero__headline {
   margin: 0;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   line-height: 1.3;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -54,231 +57,185 @@
 }
 
 .codify-hero__sub {
-  margin: 0.75rem 0 0;
+  margin: 0.7rem 0 0;
   font-size: 0.85rem;
   color: #b9c2cc;
 }
 
-/* ── Layout ───────────────────────────────────────────────────────────── */
+/* ── Grid ─────────────────────────────────────────────────────────────── */
 .codify-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  align-items: start;
   gap: 1rem;
   padding: 1rem;
 }
 
-.codify-panel {
+/* ── The one card ─────────────────────────────────────────────────────── */
+.codify-card {
   background: var(--codify-surface);
   border: 1px solid var(--codify-line);
   border-radius: var(--slds-g-radius-border-3, 0.5rem);
-  padding: 1.25rem 1.25rem 1.35rem;
+  padding: 1.1rem 1.15rem 1.2rem;
 }
 
-/* The funnel earns the full width; it is the argument the page makes. */
-.codify-panel_wide {
-  grid-column: 1 / -1;
+/* Only exception to the uniform width: the human-work card carries four rows
+   of prose and needs the extra column to avoid wrapping every label. */
+.codify-card_wide {
+  grid-column: span 2;
 }
 
-.codify-panel_action {
-  border-left: 3px solid var(--codify-accent);
+@media (max-width: 48rem) {
+  .codify-card_wide {
+    grid-column: span 1;
+  }
 }
 
-.codify-panel_reach {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.codify-panel__title {
-  margin: 0 0 0.25rem;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--codify-ink);
-}
-
-.codify-panel__hint {
-  margin: 0 0 1rem;
-  font-size: 0.75rem;
-  line-height: 1.5;
-  color: var(--codify-muted);
-  max-width: 60ch;
-}
-
-.codify-panel__hint_tight {
-  margin: 1rem 0 0;
-}
-
-.codify-empty {
-  margin: 0.5rem 0 0;
-  font-size: 0.8rem;
-  color: var(--codify-muted);
-}
-
-/* ── Funnel ───────────────────────────────────────────────────────────── */
-.codify-funnel {
+.codify-card__title {
   margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.codify-funnel__row + .codify-funnel__row {
-  margin-top: 1.1rem;
-  padding-top: 1.1rem;
-  border-top: 1px dashed var(--codify-line);
-}
-
-.codify-funnel__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.codify-funnel__label {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 700;
   color: var(--codify-ink);
 }
 
-.codify-funnel__value {
-  font-size: 1.35rem;
+.codify-card__value {
+  margin: 0.45rem 0 0.55rem;
+  font-size: 2.25rem;
+  line-height: 1;
   font-weight: 700;
   color: var(--codify-ink);
   font-variant-numeric: tabular-nums;
 }
 
-.codify-funnel__track {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin: 0.4rem 0 0.35rem;
-}
-
-.codify-funnel-bar {
-  height: 0.6rem;
-  border-radius: 999px;
-  background: var(--codify-accent);
-  transition: width 0.4s ease;
-  min-width: 0;
-}
-
-/* Each stage a shade lighter, so depth in the funnel is legible at a glance. */
-.codify-funnel-bar_logged {
-  background: var(--codify-ink);
-}
-.codify-funnel-bar_tagged {
-  background: #04487f;
-}
-.codify-funnel-bar_drafted {
-  background: var(--codify-accent);
-}
-.codify-funnel-bar_published {
-  background: var(--codify-accent-soft);
-}
-
-.codify-funnel__pct {
-  font-size: 0.7rem;
-  color: var(--codify-muted);
-  font-variant-numeric: tabular-nums;
-  flex: 0 0 auto;
-}
-
-.codify-funnel__foot {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 0.75rem;
+.codify-card__meta {
+  margin: 0.35rem 0 0;
   font-size: 0.72rem;
   color: var(--codify-muted);
 }
 
-.codify-funnel__drop {
-  color: var(--codify-warn);
-  font-weight: 600;
-}
-
-/* ── Stats ────────────────────────────────────────────────────────────── */
-.codify-stat {
-  display: flex;
-  align-items: baseline;
-  gap: 0.65rem;
-  padding: 0.5rem 0;
-}
-
-.codify-stat + .codify-stat {
-  border-top: 1px solid var(--codify-line);
-}
-
-.codify-stat__num {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--codify-ink);
-  font-variant-numeric: tabular-nums;
-  min-width: 2.2ch;
-}
-
-.codify-stat__num_warn {
-  color: var(--codify-warn);
-}
-
-.codify-stat__label {
-  font-size: 0.78rem;
-  line-height: 1.4;
+.codify-card__note {
+  margin: 0.5rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.5;
   color: var(--codify-muted);
 }
 
-.codify-stat_big .codify-stat__num {
-  font-size: 3rem;
-  line-height: 1;
-  color: var(--codify-accent);
-}
-
-/* ── Root causes ──────────────────────────────────────────────────────── */
-.codify-causes {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.codify-causes__row {
-  display: grid;
-  grid-template-columns: minmax(7rem, 1fr) 2fr auto;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.35rem 0;
-}
-
-.codify-causes__label {
+.codify-empty {
+  margin: 0.6rem 0 0;
   font-size: 0.78rem;
-  color: var(--codify-ink);
+  color: var(--codify-muted);
 }
 
-.codify-causes__track {
+.codify-empty_page {
+  padding: 0 1rem 1rem;
+}
+
+/* ── Bars, shared by the stat cards and the ranked lists ──────────────── */
+.codify-track {
   display: block;
-  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+  background: var(--codify-track);
   border-radius: 999px;
-  height: 0.5rem;
+  height: 0.45rem;
+  overflow: hidden;
 }
 
-.codify-causes__bar {
+.codify-bar {
   display: block;
   height: 100%;
   border-radius: 999px;
   background: var(--codify-accent);
+  transition: width 0.4s ease;
 }
 
-.codify-causes__count {
-  font-size: 0.78rem;
+/* Pipeline stages get progressively lighter, so depth reads at a glance. */
+.codify-bar_described {
+  background: var(--codify-ink);
+}
+.codify-bar_tagged {
+  background: var(--codify-deep);
+}
+.codify-bar_drafted {
+  background: var(--codify-accent);
+}
+.codify-bar_published {
+  background: var(--codify-accent-soft);
+}
+
+/* ── Ranked bar lists ─────────────────────────────────────────────────── */
+.codify-bars {
+  margin: 0.7rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.codify-bars__row {
+  display: grid;
+  grid-template-columns: minmax(6rem, 1fr) minmax(3rem, 1.2fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+}
+
+.codify-bars__label {
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--codify-ink);
+}
+
+.codify-bars__count {
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--codify-muted);
   font-variant-numeric: tabular-nums;
+}
+
+/* ── Value + label rows (the human-work card) ─────────────────────────── */
+.codify-rows {
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.codify-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  padding: 0.5rem 0;
+}
+
+.codify-row + .codify-row {
+  border-top: 1px solid var(--codify-line);
+}
+
+.codify-row__num {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--codify-ink);
+  font-variant-numeric: tabular-nums;
+  min-width: 2ch;
+}
+
+.codify-row__num_warn {
+  color: var(--codify-warn);
+}
+
+.codify-row__num_good {
+  color: var(--codify-good);
+}
+
+.codify-row__label {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--codify-muted);
 }
 
 /* ── Sparkline ────────────────────────────────────────────────────────── */
 .codify-spark {
   display: flex;
   align-items: flex-end;
-  gap: 0.4rem;
-  height: 7rem;
+  gap: 0.35rem;
+  height: 6rem;
+  margin-top: 0.7rem;
 }
 
 .codify-spark__col {
@@ -299,7 +256,7 @@
 }
 
 .codify-spark__count {
-  margin-top: 0.35rem;
+  margin-top: 0.3rem;
   font-size: 0.68rem;
   color: var(--codify-muted);
   font-variant-numeric: tabular-nums;
