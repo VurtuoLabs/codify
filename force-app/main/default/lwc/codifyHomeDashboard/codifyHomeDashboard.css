@@ -1,10 +1,14 @@
 /*
   Codify Home.
 
-  One card treatment, used for every measure on the page. The grid is
-  align-items:start so a card sizes to its content instead of stretching to match
-  its tallest neighbour — that stretching was leaving large dead areas inside the
-  shorter cards.
+  One card treatment, one card size, used for every measure on the page. There
+  are no width spans and no variants: the grid rows are all 1fr and the cards
+  stretch to fill them, so the edges line up whatever the content.
+
+  What keeps that from leaving dead space inside the shorter cards is that each
+  card is a flex column with its closing note pushed to the bottom, and the lists
+  and sparkline flex to fill — so the extra height is absorbed rather than left
+  as a gap.
 
   Colours come from SLDS styling hooks with literal fallbacks, so the page still
   holds up in an org that has themed its hooks differently.
@@ -65,30 +69,22 @@
 /* ── Grid ─────────────────────────────────────────────────────────────── */
 .codify-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
-  align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr));
+  grid-auto-rows: 1fr;
+  align-items: stretch;
   gap: 1rem;
   padding: 1rem;
 }
 
-/* ── The one card ─────────────────────────────────────────────────────── */
+/* ── The one card: no variants, no spans ──────────────────────────────── */
 .codify-card {
+  display: flex;
+  flex-direction: column;
   background: var(--codify-surface);
   border: 1px solid var(--codify-line);
   border-radius: var(--slds-g-radius-border-3, 0.5rem);
   padding: 1.1rem 1.15rem 1.2rem;
-}
-
-/* Only exception to the uniform width: the human-work card carries four rows
-   of prose and needs the extra column to avoid wrapping every label. */
-.codify-card_wide {
-  grid-column: span 2;
-}
-
-@media (max-width: 48rem) {
-  .codify-card_wide {
-    grid-column: span 1;
-  }
+  min-height: 11rem;
 }
 
 .codify-card__title {
@@ -113,11 +109,15 @@
   color: var(--codify-muted);
 }
 
+/* Pinned to the bottom so the closing line sits on a common baseline across
+   the row, whatever height the grid settles on. */
 .codify-card__note {
   margin: 0.5rem 0 0;
+  padding-top: 0.5rem;
   font-size: 0.72rem;
   line-height: 1.5;
   color: var(--codify-muted);
+  margin-top: auto;
 }
 
 .codify-empty {
@@ -161,11 +161,27 @@
   background: var(--codify-accent-soft);
 }
 
+/* Outstanding work and reach: same bar, different reading. */
+.codify-bar_warn {
+  background: var(--codify-warn);
+}
+.codify-bar_good {
+  background: var(--codify-good);
+}
+
+.codify-card__value_warn {
+  color: var(--codify-warn);
+}
+.codify-card__value_good {
+  color: var(--codify-good);
+}
+
 /* ── Ranked bar lists ─────────────────────────────────────────────────── */
 .codify-bars {
   margin: 0.7rem 0 0;
   padding: 0;
   list-style: none;
+  flex: 1;
 }
 
 .codify-bars__row {
@@ -189,52 +205,13 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ── Value + label rows (the human-work card) ─────────────────────────── */
-.codify-rows {
-  margin: 0.6rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.codify-row {
-  display: flex;
-  align-items: baseline;
-  gap: 0.7rem;
-  padding: 0.5rem 0;
-}
-
-.codify-row + .codify-row {
-  border-top: 1px solid var(--codify-line);
-}
-
-.codify-row__num {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--codify-ink);
-  font-variant-numeric: tabular-nums;
-  min-width: 2ch;
-}
-
-.codify-row__num_warn {
-  color: var(--codify-warn);
-}
-
-.codify-row__num_good {
-  color: var(--codify-good);
-}
-
-.codify-row__label {
-  font-size: 0.78rem;
-  line-height: 1.4;
-  color: var(--codify-muted);
-}
-
 /* ── Sparkline ────────────────────────────────────────────────────────── */
 .codify-spark {
   display: flex;
   align-items: flex-end;
   gap: 0.35rem;
-  height: 6rem;
+  flex: 1;
+  min-height: 5rem;
   margin-top: 0.7rem;
 }
 
