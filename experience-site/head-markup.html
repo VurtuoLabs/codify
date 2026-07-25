@@ -69,6 +69,42 @@
       accentHover: "#014486"
     };
 
+    // ── SCOPE ────────────────────────────────────────────────────────────
+    /**
+     * Everything below is confined to the embedded messaging widget. This file
+     * runs in the <head> of the whole Experience Cloud site, so an unscoped
+     * stylesheet (or an unscoped shadow-root walk) restyles the entire portal,
+     * not just Codify. Rules like "html, body" and "p, span, div" are safe
+     * INSIDE a shadow root, which is self-scoping, and ruinous outside one.
+     *
+     * These selectors cover the launcher and the conversation across the
+     * embedded messaging versions; unknown ones simply match nothing.
+     */
+    var ROOT_SELECTORS = [
+      "#embeddedMessagingFrame",
+      ".embeddedMessagingFrame",
+      "#embedded-messaging",
+      ".embedded-messaging",
+      "embeddedservice-chat",
+      "embeddedservice-messaging",
+      ".embeddedMessagingConversation",
+      "#embeddedMessagingConversationButton"
+    ];
+
+    /** The widget's root elements on this page, if it has rendered yet. */
+    function messagingRoots() {
+      var out = [];
+      for (var i = 0; i < ROOT_SELECTORS.length; i++) {
+        try {
+          var found = document.querySelectorAll(ROOT_SELECTORS[i]);
+          for (var j = 0; j < found.length; j++) out.push(found[j]);
+        } catch (e) {
+          /* selector unsupported here; skip */
+        }
+      }
+      return out;
+    }
+
     // ── DARK MODE ────────────────────────────────────────────────────────
     // The messaging window renders inside nested shadow roots, so a single
     // page-level stylesheet cannot reach it. Every rule below is injected
@@ -281,19 +317,49 @@
           /* skip inaccessible subtree */
         }
       }
-      walk(document);
+      // Confined to the widget for the same reason as the stylesheet: a
+      // document-wide walk would match, and restyle, portal elements.
+      messagingRoots().forEach(walk);
       return out;
     }
+
+    /**
+     * The only rules that belong in the page's own stylesheet: the widget's
+     * outer box. Every selector is prefixed with the widget root, so nothing
+     * here can reach the portal around it. The conversation's interior is
+     * handled by shadow-root injection instead, where the rules are naturally
+     * scoped.
+     */
+    var SCOPED_PAGE_CSS = ROOT_SELECTORS.map(function (r) {
+      return (
+        r +
+        ", " +
+        r +
+        " * { --lwc-brandPrimary: " +
+        BRAND.accent +
+        " !important; }\n" +
+        r +
+        " { color-scheme: dark; }"
+      );
+    }).join("\n");
 
     function applyDarkMode() {
       var s = document.getElementById("codify-dark-root");
       if (!s) {
         s = document.createElement("style");
         s.id = "codify-dark-root";
-        s.textContent = DARK_CSS;
+        s.textContent = SCOPED_PAGE_CSS;
         document.head.appendChild(s);
       }
-      walkAndInjectDark(document);
+      // Walk only the widget's subtree. Walking `document` reaches every LWC on
+      // the portal and repaints the lot.
+      messagingRoots().forEach(function (root) {
+        if (root.shadowRoot) {
+          injectDarkIntoShadow(root.shadowRoot);
+          walkAndInjectDark(root.shadowRoot);
+        }
+        walkAndInjectDark(root);
+      });
 
       // The launcher says what it does. "Chat" undersells it: the
       // technician is logging a fix, not opening a support conversation.
@@ -759,6 +825,42 @@
         .addEventListener("click", minimizeChat);
     }
 
+    // ── PRE-CHAT CONTEXT ─────────────────────────────────────────────────
+    /**
+     * Push the Case onto the conversation itself, not just into these panels.
+     *
+     * This has to go through the pre-chat API rather than through hidden form
+     * fields on the deployment: Salesforce rejects an embedded messaging
+     * deployment whose standard messaging parameters are marked hidden
+     * ("Form field of type StandardMessagingChannelParameter can't be a hidden
+     * field"), so the deployment carries no pre-chat form at all and the values
+     * are set at runtime instead.
+     *
+     * Called on every CODIFY_SET_CASE, and again once the agent is ready,
+     * because the API is only accepted before the conversation starts and the
+     * host page may hand us the Case either side of that moment.
+     */
+    function pushCaseContext() {
+      if (!currentCase.number && !currentCase.id) return;
+      try {
+        if (
+          typeof embeddedservice_bootstrap !== "undefined" &&
+          embeddedservice_bootstrap.prechatAPI &&
+          embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields
+        ) {
+          embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+            // Subject is a standard messaging parameter, so it reaches the
+            // agent as conversation context without extra channel config.
+            _subject: caseLabel(),
+            CaseId: currentCase.id || "",
+            CaseNumber: currentCase.number || ""
+          });
+        }
+      } catch (e) {
+        /* pre-chat already closed; the agent will ask which Case instead */
+      }
+    }
+
     // ── HOST BRIDGE ──────────────────────────────────────────────────────
     // The host Experience Cloud page drives these. CODIFY_SET_CASE is what
     // carries pre-chat context in, so the technician is never asked which
@@ -770,6 +872,7 @@
           currentCase.id = data.caseId || null;
           currentCase.number = data.caseNumber || "";
           currentCase.subject = data.caseSubject || "";
+          pushCaseContext();
           break;
         case "CODIFY_SHOW_WELCOME":
           injectWelcomePanel();
@@ -780,6 +883,7 @@
           break;
         case "CODIFY_INPUT_ON":
           agentReady = true;
+          pushCaseContext();
           if (pendingUtterance) {
             var queued = pendingUtterance;
             pendingUtterance = null;

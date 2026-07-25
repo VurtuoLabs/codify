@@ -1,6 +1,315 @@
-.codify-bar {
-  height: var(--slds-g-spacing-3, 0.75rem);
-  border-radius: var(--slds-g-radius-border-2, 0.75rem);
-  background: var(--slds-g-color-accent-container-1, #0176d3);
-  transition: width 0.3s ease;
+/*
+  Codify Home.
+
+  Intentionally not the standard lightning-card grid every other app home uses.
+  The page is built from a dark hero band and flat panels so it reads as its own
+  surface, and so the funnel — the argument the product actually makes — gets the
+  full width rather than being one tile among six.
+
+  Colours come from SLDS styling hooks with literal fallbacks, so the page still
+  holds up in an org that has themed its hooks differently.
+*/
+
+:host {
+  display: block;
+  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+.codify-home {
+  --codify-ink: #0b0f14;
+  --codify-accent: #0176d3;
+  --codify-accent-soft: #5eb0ff;
+  --codify-warn: #fe9339;
+  --codify-line: var(--slds-g-color-border-base-1, #e5e5e5);
+  --codify-surface: var(--slds-g-color-neutral-base-100, #fff);
+  --codify-muted: var(--slds-g-color-neutral-base-40, #5c5c5c);
+  padding-bottom: 1rem;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+.codify-hero {
+  background: var(--codify-ink);
+  color: #fff;
+  padding: 2rem 2rem 2.25rem;
+  border-radius: 0 0 var(--slds-g-radius-border-4, 1rem)
+    var(--slds-g-radius-border-4, 1rem);
+}
+
+.codify-hero__eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--codify-accent-soft);
+}
+
+.codify-hero__headline {
+  margin: 0;
+  font-size: 1.6rem;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  max-width: 46ch;
+}
+
+.codify-hero__sub {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: #b9c2cc;
+}
+
+/* ── Layout ───────────────────────────────────────────────────────────── */
+.codify-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.codify-panel {
+  background: var(--codify-surface);
+  border: 1px solid var(--codify-line);
+  border-radius: var(--slds-g-radius-border-3, 0.5rem);
+  padding: 1.25rem 1.25rem 1.35rem;
+}
+
+/* The funnel earns the full width; it is the argument the page makes. */
+.codify-panel_wide {
+  grid-column: 1 / -1;
+}
+
+.codify-panel_action {
+  border-left: 3px solid var(--codify-accent);
+}
+
+.codify-panel_reach {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.codify-panel__title {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--codify-ink);
+}
+
+.codify-panel__hint {
+  margin: 0 0 1rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--codify-muted);
+  max-width: 60ch;
+}
+
+.codify-panel__hint_tight {
+  margin: 1rem 0 0;
+}
+
+.codify-empty {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  color: var(--codify-muted);
+}
+
+/* ── Funnel ───────────────────────────────────────────────────────────── */
+.codify-funnel {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.codify-funnel__row + .codify-funnel__row {
+  margin-top: 1.1rem;
+  padding-top: 1.1rem;
+  border-top: 1px dashed var(--codify-line);
+}
+
+.codify-funnel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.codify-funnel__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--codify-ink);
+}
+
+.codify-funnel__value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--codify-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.codify-funnel__track {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.4rem 0 0.35rem;
+}
+
+.codify-funnel-bar {
+  height: 0.6rem;
+  border-radius: 999px;
+  background: var(--codify-accent);
+  transition: width 0.4s ease;
+  min-width: 0;
+}
+
+/* Each stage a shade lighter, so depth in the funnel is legible at a glance. */
+.codify-funnel-bar_logged {
+  background: var(--codify-ink);
+}
+.codify-funnel-bar_tagged {
+  background: #04487f;
+}
+.codify-funnel-bar_drafted {
+  background: var(--codify-accent);
+}
+.codify-funnel-bar_published {
+  background: var(--codify-accent-soft);
+}
+
+.codify-funnel__pct {
+  font-size: 0.7rem;
+  color: var(--codify-muted);
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+}
+
+.codify-funnel__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  font-size: 0.72rem;
+  color: var(--codify-muted);
+}
+
+.codify-funnel__drop {
+  color: var(--codify-warn);
+  font-weight: 600;
+}
+
+/* ── Stats ────────────────────────────────────────────────────────────── */
+.codify-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  padding: 0.5rem 0;
+}
+
+.codify-stat + .codify-stat {
+  border-top: 1px solid var(--codify-line);
+}
+
+.codify-stat__num {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--codify-ink);
+  font-variant-numeric: tabular-nums;
+  min-width: 2.2ch;
+}
+
+.codify-stat__num_warn {
+  color: var(--codify-warn);
+}
+
+.codify-stat__label {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--codify-muted);
+}
+
+.codify-stat_big .codify-stat__num {
+  font-size: 3rem;
+  line-height: 1;
+  color: var(--codify-accent);
+}
+
+/* ── Root causes ──────────────────────────────────────────────────────── */
+.codify-causes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.codify-causes__row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 1fr) 2fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0;
+}
+
+.codify-causes__label {
+  font-size: 0.78rem;
+  color: var(--codify-ink);
+}
+
+.codify-causes__track {
+  display: block;
+  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+  border-radius: 999px;
+  height: 0.5rem;
+}
+
+.codify-causes__bar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--codify-accent);
+}
+
+.codify-causes__count {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--codify-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Sparkline ────────────────────────────────────────────────────────── */
+.codify-spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.4rem;
+  height: 7rem;
+}
+
+.codify-spark__col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.codify-spark__fill {
+  width: 100%;
+  border-radius: var(--slds-g-radius-border-1, 0.125rem)
+    var(--slds-g-radius-border-1, 0.125rem) 0 0;
+  background: var(--codify-accent);
+  transition: height 0.4s ease;
+}
+
+.codify-spark__count {
+  margin-top: 0.35rem;
+  font-size: 0.68rem;
+  color: var(--codify-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 30rem) {
+  .codify-hero {
+    padding: 1.5rem 1.25rem;
+  }
+  .codify-hero__headline {
+    font-size: 1.25rem;
+  }
 }

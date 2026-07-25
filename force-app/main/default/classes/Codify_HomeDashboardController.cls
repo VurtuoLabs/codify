@@ -27,6 +27,12 @@ public with sharing class Codify_HomeDashboardController {
     @AuraEnabled
     public Integer articlesPending = 0;
     @AuraEnabled
+    public Integer articlesPublished = 0;
+    @AuraEnabled
+    public Integer resolutionsTagged = 0;
+    @AuraEnabled
+    public Integer resolutionsUntagged = 0;
+    @AuraEnabled
     public Integer casesFlagged = 0;
     @AuraEnabled
     public Integer escalations = 0;
@@ -83,7 +89,16 @@ public with sharing class Codify_HomeDashboardController {
         Change_Type__c = :Codify_Constants.CHANGE_RELATED_CASE_FLAGGED
         AND CreatedDate = THIS_WEEK
     ];
-    s.articlesPending = countPendingDrafts();
+    s.articlesPending = countDrafts(Codify_Constants.KNOWLEDGE_DRAFT_STATUS);
+    s.articlesPublished = countDrafts('Online');
+
+    // The funnel the home page is built around: how far a recap travelled.
+    s.resolutionsTagged = [
+      SELECT COUNT()
+      FROM Codify_Resolution_Log__c
+      WHERE Root_Cause_Category__c != NULL
+    ];
+    s.resolutionsUntagged = s.resolutionsAllTime - s.resolutionsTagged;
 
     for (AggregateResult ar : [
       SELECT Root_Cause_Category__c cause, COUNT(Id) cnt
@@ -203,23 +218,24 @@ public with sharing class Codify_HomeDashboardController {
   }
 
   /**
-   * Knowledge drafts still awaiting a human. Queried defensively because
-   * Knowledge may not be enabled in every org this deploys to, and a dashboard
-   * tile is not worth failing the whole page over.
+   * Codify-authored articles in a given publish state, which is what lets the
+   * home page show drafted and published as separate funnel stages rather than
+   * one undifferentiated "articles" number.
+   *
+   * Queried defensively because Knowledge may not be enabled in every org this
+   * deploys to, and a dashboard tile is not worth failing the whole page over.
    */
-  private static Integer countPendingDrafts() {
+  private static Integer countDrafts(String publishStatus) {
     try {
       return [
         SELECT COUNT()
         FROM Knowledge__kav
-        WHERE
-          Codify_Generated__c = TRUE
-          AND PublishStatus = :Codify_Constants.KNOWLEDGE_DRAFT_STATUS
+        WHERE Codify_Generated__c = TRUE AND PublishStatus = :publishStatus
       ];
     } catch (Exception e) {
       System.debug(
         LoggingLevel.WARN,
-        'Codify: pending draft count unavailable: ' + e.getMessage()
+        'Codify: article count unavailable: ' + e.getMessage()
       );
       return 0;
     }

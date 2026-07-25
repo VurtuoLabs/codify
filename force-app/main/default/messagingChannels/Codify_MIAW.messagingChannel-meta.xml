@@ -8,22 +8,25 @@
   providers typically only have Experience Cloud access. MIAW reaches them where
   they already are.
 
-  sessionHandlerType is Router rather than Flow or Queue on purpose. A resolution
-  recap is a single synchronous exchange between a technician and the agent, so
-  there is no human queue to route to and nothing to hand off; routing to an
-  omni-channel queue would put a person in the middle of a conversation that does
-  not need one.
+  A resolution recap is a single synchronous exchange between a technician and
+  the agent, with no human in the middle. That does NOT mean the channel can skip
+  Omni-Channel routing: a messaging session still has to be routed to something,
+  and the only way to route it to an Agentforce agent is a RoutingFlow that calls
+  routeWork with routingType Bot. See Codify_Route_To_Agent.
 -->
 <MessagingChannel xmlns="http://soap.sforce.com/2006/04/metadata">
     <masterLabel>Codify</masterLabel>
     <messagingChannelType>EmbeddedMessaging</messagingChannelType>
     <!--
-      Sessions hand off to the Support Ops queue rather than to a routing flow.
-      A resolution recap is a single synchronous exchange with the agent, so
-      there is no work to distribute; the queue exists for the exception, a
-      technician who asks for a person, not for the normal path.
+      Sessions route through an Omni-Channel flow that hands the conversation to
+      the Codify agent (routingType Bot). This must NOT be a plain Queue handler:
+      routing a messaging session to a queue waits for a human to accept it, so
+      the technician's message just sits at "Sent" and the agent never joins.
+      The queue below is the fallback the routing flow falls back to, not the
+      primary target.
     -->
-    <sessionHandlerType>Queue</sessionHandlerType>
+    <sessionHandlerType>Flow</sessionHandlerType>
+    <sessionHandlerFlow>Codify_Route_To_Agent</sessionHandlerFlow>
     <sessionHandlerQueue>Codify_Support_Ops</sessionHandlerQueue>
 
     <automatedResponses>

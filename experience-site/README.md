@@ -12,35 +12,85 @@ experience a technician sees.
 The platform-side metadata lives in `force-app/main/default/`:
 
 - `messagingChannels/Codify_MIAW.messagingChannel-meta.xml` — the MIAW channel
+- `flows/Codify_Route_To_Agent.flow-meta.xml` — the Omni-Channel routing flow that puts the agent in the conversation
 - `EmbeddedServiceConfig/Codify_Embedded.EmbeddedServiceConfig-meta.xml` — the deployment
-- `EmbeddedServiceBranding/Codify_Branding.EmbeddedServiceBranding-meta.xml` — platform chrome colours
 - `queues/Codify_Support_Ops.queue-meta.xml` — the session handler and human fallback
 
 ## Setup order
 
-MIAW deployments cannot be created purely from source, because every embedded
-deployment needs its own **ESW site** and Salesforce mints those only when you
-create the deployment in Setup. A site can back exactly one deployment, so it
-cannot be shared or invented.
+The `<site>` on the deployment is **org-specific**: a CustomSite can back exactly
+one embedded deployment, so the value in source will not match a fresh org.
+Everything else deploys as-is.
 
-1. Deploy the queue and channel:
+1. Deploy the queue, the routing flow, then the channel (the channel references
+   the flow, so the flow must exist first):
    ```
    sf project deploy start -d force-app/main/default/queues -o <org>
+   sf project deploy start -d force-app/main/default/flows/Codify_Route_To_Agent.flow-meta.xml -o <org>
    sf project deploy start -d force-app/main/default/messagingChannels -o <org>
    ```
-2. In Setup → **Embedded Service Deployments** → New → Messaging for In-App and Web,
-   point it at the **Codify** messaging channel. This creates the `ESW_…` site.
-3. Copy that site's name into `<site>` in `Codify_Embedded.EmbeddedServiceConfig-meta.xml`,
-   replacing `ESW_Codify_Placeholder`.
-4. Deploy the config, then the branding (in that order — the two reference each
-   other, so branding cannot land until the config exists):
+   `routeWork` takes literal record ids, so re-point the three ids in the routing
+   flow first:
+   ```
+   sf data query -o <org> -q "SELECT Id FROM BotDefinition WHERE DeveloperName='Codify_Agent'"
+   sf data query -o <org> -q "SELECT Id FROM Group WHERE DeveloperName='Codify_Support_Ops' AND Type='Queue'"
+   sf data query -o <org> -q "SELECT Id FROM ServiceChannel WHERE DeveloperName='sfdc_livemessage'"
+   ```
+2. Point `<site>` in `Codify_Embedded.EmbeddedServiceConfig-meta.xml` at a
+   CustomSite in the target org that no other deployment is using. Creating the
+   deployment once in Setup → **Embedded Service Deployments** also mints a
+   dedicated `ESW_…` site you can use instead.
+3. Deploy the config:
    ```
    sf project deploy start -d force-app/main/default/EmbeddedServiceConfig -o <org>
-   sf project deploy start -d force-app/main/default/EmbeddedServiceBranding -o <org>
+   ```
+4. Publish and activate the agent:
+   ```
+   sf agent publish authoring-bundle --api-name Codify_Agent -o <org>
+   sf agent activate --api-name Codify_Agent -o <org>
    ```
 5. Paste `head-markup.html` into the Experience Cloud site's head markup.
 6. Add the Embedded Messaging component to the Case detail page, and wire the host
    page to post `CODIFY_SET_CASE` — see the contract below.
+
+### The agent has to be routed to, or it never joins
+
+The single most confusing failure in this stack: the window opens, the technician
+types, the message shows **Sent**, and nothing ever answers.
+
+A messaging session is Omni-Channel work, and it has to be routed somewhere. A
+`sessionHandlerType` of `Queue` routes it to _people_ — so the session sits
+waiting for a human to accept it, and since there is no human behind Codify, it
+waits forever. The only way to hand a session to an Agentforce agent is a
+`RoutingFlow` that calls `routeWork` with `routingType: Bot` and the agent's
+`botId`. That is what `Codify_Route_To_Agent` does, and the channel points at it
+with `sessionHandlerType: Flow`.
+
+The queue is still configured, as the fallback `routeWork` uses if the agent
+cannot take the work. It is the fallback, not the destination.
+
+Also check the agent is actually live, since publishing alone is not enough:
+
+```
+sf data query -o <org> -q "SELECT BotDefinitionId, VersionNumber, Status FROM BotVersion"
+```
+
+### Two things that are not configurable, and why
+
+**The deployment carries no pre-chat form.** Salesforce rejects an embedded
+messaging deployment whose standard messaging parameters are marked hidden
+(_"Form field of type StandardMessagingChannelParameter can't be a hidden
+field"_), and a _visible_ pre-chat form asking a technician to key a Case number
+would reintroduce exactly the friction Codify exists to remove. So the deployment
+has no form at all, and `head-markup.html` pushes the Case in at runtime through
+`embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields()` instead. That is
+the supported route for programmatic context.
+
+**There is no `EmbeddedServiceBranding` file.** That metadata type only applies to
+Chat, Flow and Appointment Management deployments; applying it to an
+`EmbeddedMessaging` deployment fails with _"Set the Chat, Flow, or Appointment
+Management feature…"_. MIAW theming therefore lives entirely in
+`head-markup.html` plus the deployment's own settings in Setup.
 
 ## The host-page contract
 
@@ -76,14 +126,28 @@ that utterance and releases it when `INPUT_ON` arrives.
 
 ## Theming
 
-`head-markup.html` restyles what lives _inside_ the messaging window's nested
-shadow roots, which a page-level stylesheet cannot reach; it walks every shadow
-root and injects an adopted stylesheet. `EmbeddedServiceBranding` controls the
-chrome the platform draws _around_ it.
+`head-markup.html` restyles what lives _inside_ the messaging widget's nested
+shadow roots, which a page-level stylesheet cannot reach; it injects an adopted
+stylesheet into each one.
 
-The two are kept in step by hand. If you change `BRAND.accent` in the head markup,
-change `primaryColor` in the branding file to match, or the launcher and the
-conversation will visibly disagree.
+**Everything is scoped to the widget.** This file runs in the `<head>` of the
+whole Experience Cloud site, so an unscoped version restyles the entire portal:
+rules like `html, body` and `p, span, div` are harmless inside a shadow root,
+which is self-scoping, and destructive outside one. Two things enforce the scope,
+and both matter if you extend this file:
+
+- the page-level `<style>` contains only rules prefixed with the widget root, and
+- the shadow-root walk and `queryDeep` start from `messagingRoots()`, never from
+  `document`.
+
+If the widget's markup changes in a future release, add the new container
+selector to `ROOT_SELECTORS` rather than widening any selector.
+
+Because `EmbeddedServiceBranding` is unavailable for MIAW (see above), the head
+markup is the single source of truth for the look. The one palette to edit is the
+`BRAND` object at the top of the script; every rule below it is built from those
+values, so changing `BRAND.accent` retints the launcher, the technician's message
+bubbles and the panel buttons together.
 
 ## Why it looks different from the VenueNation concierge
 
