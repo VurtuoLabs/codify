@@ -254,9 +254,13 @@ All fixed here. Each failed with an error that pointed nowhere near its cause, w
 5. **A messaging channel with a Queue session handler never reaches the agent.** The window opens, the message shows "Sent", and nothing answers, because queue routing waits for a _human_ to accept the work. Handing a session to an Agentforce agent requires a `RoutingFlow` calling `routeWork` with `routingType: Bot` — `Codify_Route_To_Agent`. The queue remains only as `routeWork`'s fallback.
 6. **The Experience Cloud head markup has to be scoped to the messaging widget.** It runs in the `<head>` of the whole site, so a stylesheet containing `html, body` and `p, span, div` — perfectly safe inside a shadow root, which is self-scoping — repaints the entire portal when injected at page level. The page-level rules are now prefixed with the widget root, and the shadow walk starts from the widget rather than `document`.
 
-### Org-specific by nature
+### The one thing that cannot come from source
 
-The `<site>` on `Codify_Embedded` points at the `Codify` Experience site in this org. A CustomSite can back exactly one embedded deployment, so this value must change per org. See [`experience-site/README.md`](experience-site/README.md), which also explains why the deployment deliberately has no pre-chat form and no `EmbeddedServiceBranding`.
+An embedded messaging deployment must point `<site>` at a **dedicated ESW site**, and only the Setup wizard mints one. The Tooling API refuses to create a deployment without it (`REQUIRED_FIELD_MISSING: SiteId`) and will not generate it.
+
+Pointing `<site>` at an ordinary Experience site deploys cleanly and then fails silently — which is exactly what happened here. The deployment can never be published, so its config endpoint stays on `HTTP 412 "Embedded Messaging Config is not Published"`, no chat button renders (the bootstrap fetches that config before drawing anything), and Setup refuses to change the CWC version. Publishing the Experience _site_ is a different operation and does not help.
+
+`<site>` is therefore an explicit placeholder. Create the deployment in Setup, publish it, then copy the generated `ESW_…` name into the file. The [`experience-site/README.md`](experience-site/README.md) has the steps and the `curl` check that distinguishes published from not — it also explains why the deployment deliberately has no pre-chat form and no `EmbeddedServiceBranding`.
 
 ## License
 
