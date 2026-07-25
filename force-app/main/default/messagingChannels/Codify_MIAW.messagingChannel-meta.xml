@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  The Messaging for In-App and Web channel Codify runs on.
+
+  Codify is deployed over MIAW rather than as an internal Agentforce chat because
+  the people who know how a Case was actually fixed frequently do not hold a full
+  Salesforce licence: field technicians, franchise partners and contracted service
+  providers typically only have Experience Cloud access. MIAW reaches them where
+  they already are.
+
+  A resolution recap is a single synchronous exchange between a technician and
+  the agent, with no human in the middle. That does NOT mean the channel can skip
+  Omni-Channel routing: a messaging session still has to be routed to something,
+  and the only way to route it to an Agentforce agent is a RoutingFlow that calls
+  routeWork with routingType Bot. See Codify_Route_To_Agent.
+-->
+<MessagingChannel xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Codify</masterLabel>
+    <messagingChannelType>EmbeddedMessaging</messagingChannelType>
+    <!--
+      Sessions route through an Omni-Channel flow that hands the conversation to
+      the Codify agent (routingType Bot). This must NOT be a plain Queue handler:
+      routing a messaging session to a queue waits for a human to accept it, so
+      the technician's message just sits at "Sent" and the agent never joins.
+      The queue below is the fallback the routing flow falls back to, not the
+      primary target.
+    -->
+    <sessionHandlerType>Flow</sessionHandlerType>
+    <sessionHandlerFlow>Codify_Route_To_Agent</sessionHandlerFlow>
+    <sessionHandlerQueue>Codify_Support_Ops</sessionHandlerQueue>
+
+    <automatedResponses>
+        <autoResponseContentType>TextResponse</autoResponseContentType>
+        <language>en_US</language>
+        <response
+    >No problem, you can close this any time. Anything you already described has been saved.</response>
+        <type>OptOutConfirmation</type>
+    </automatedResponses>
+    <automatedResponses>
+        <autoResponseContentType>TextResponse</autoResponseContentType>
+        <language>en_US</language>
+        <response
+    >Just tell me how you fixed the issue in your own words. Type STOP to end the session.</response>
+        <type>HelpResponse</type>
+    </automatedResponses>
+
+    <messagingKeywords>
+        <keyword>cancel</keyword>
+        <keyword>end</keyword>
+        <keyword>quit</keyword>
+        <keyword>stop</keyword>
+        <keyword>stopall</keyword>
+        <keyword>unsubscribe</keyword>
+        <keywordType>OptOut</keywordType>
+        <language>en_US</language>
+    </messagingKeywords>
+    <messagingKeywords>
+        <keyword>help</keyword>
+        <keywordType>Help</keywordType>
+        <language>en_US</language>
+    </messagingKeywords>
+
+    <!--
+      Pre-chat context. The Case id arrives from the host page when Codify is
+      launched from a Case detail component, which is why the agent never has to
+      open with "which case are you closing?". The subject rides along so the
+      welcome panel can show the technician what they are about to close and
+      they can catch a wrong launch before dictating anything.
+    -->
+    <standardParameters>
+        <parameterType>Subject</parameterType>
+    </standardParameters>
+    <standardParameters>
+        <parameterType>FirstName</parameterType>
+    </standardParameters>
+    <standardParameters>
+        <parameterType>LastName</parameterType>
+    </standardParameters>
+    <standardParameters>
+        <parameterType>Email</parameterType>
+    </standardParameters>
+</MessagingChannel>
