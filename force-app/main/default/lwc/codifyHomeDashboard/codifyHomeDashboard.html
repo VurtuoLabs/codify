@@ -13,19 +13,31 @@
     </template>
 
     <div class="codify-grid">
-      <!-- Eight measures, one markup block. Successes and outstanding work sit
-           in the same grid on purpose; both are equally the point. -->
-      <template for:each={statCards} for:item="c">
-        <section key={c.key} class="codify-card">
-          <h2 class="codify-card__title">{c.title}</h2>
-          <p class={c.valueClass}>{c.value}</p>
-          <div class="codify-track">
-            <div class={c.barClass} style={c.style}></div>
-          </div>
-          <p class="codify-card__meta">{c.meta}</p>
-          <p class="codify-card__note">{c.note}</p>
-        </section>
-      </template>
+      <section class="codify-card">
+        <h2 class="codify-card__title">What Codify did</h2>
+        <p class="codify-card__meta">Audited actions this week, by type.</p>
+        <template if:true={hasChangeTypes}>
+          <ul class="codify-bars">
+            <template for:each={changeTypeBars} for:item="b">
+              <li key={b.label} class="codify-bars__row">
+                <span class="codify-bars__label" title={b.label}
+                  >{b.label}</span
+                >
+                <span class="codify-track">
+                  <span
+                    class="codify-bar codify-bar_published"
+                    style={b.style}
+                  ></span>
+                </span>
+                <span class="codify-bars__count">{b.count}</span>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template if:false={hasChangeTypes}>
+          <p class="codify-empty">Nothing recorded this week.</p>
+        </template>
+      </section>
 
       <section class="codify-card">
         <h2 class="codify-card__title">What keeps breaking</h2>
@@ -53,6 +65,20 @@
         </template>
       </section>
 
+      <!-- Eight measures, one markup block. Successes and outstanding work sit
+           in the same grid on purpose; both are equally the point. -->
+      <template for:each={statCards} for:item="c">
+        <section key={c.key} class="codify-card">
+          <h2 class="codify-card__title">{c.title}</h2>
+          <p class={c.valueClass}>{c.value}</p>
+          <div class="codify-track">
+            <div class={c.barClass} style={c.style}></div>
+          </div>
+          <p class="codify-card__meta">{c.meta}</p>
+          <p class="codify-card__note">{c.note}</p>
+        </section>
+      </template>
+
       <section class="codify-card">
         <h2 class="codify-card__title">Who's capturing fixes</h2>
         <p class="codify-card__meta">Recaps logged this week.</p>
@@ -76,32 +102,6 @@
         </template>
         <template if:false={hasTechnicians}>
           <p class="codify-empty">No recaps logged this week.</p>
-        </template>
-      </section>
-
-      <section class="codify-card">
-        <h2 class="codify-card__title">What Codify did</h2>
-        <p class="codify-card__meta">Audited actions this week, by type.</p>
-        <template if:true={hasChangeTypes}>
-          <ul class="codify-bars">
-            <template for:each={changeTypeBars} for:item="b">
-              <li key={b.label} class="codify-bars__row">
-                <span class="codify-bars__label" title={b.label}
-                  >{b.label}</span
-                >
-                <span class="codify-track">
-                  <span
-                    class="codify-bar codify-bar_published"
-                    style={b.style}
-                  ></span>
-                </span>
-                <span class="codify-bars__count">{b.count}</span>
-              </li>
-            </template>
-          </ul>
-        </template>
-        <template if:false={hasChangeTypes}>
-          <p class="codify-empty">Nothing recorded this week.</p>
         </template>
       </section>
 
