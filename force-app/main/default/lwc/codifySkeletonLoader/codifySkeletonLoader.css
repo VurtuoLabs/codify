@@ -1,0 +1,83 @@
+/*
+  Skeleton placeholders. The shimmer is a slow, low-contrast sweep rather than a
+  pulse, so a page full of them does not flicker; under prefers-reduced-motion it
+  becomes a flat tint with no animation at all.
+*/
+
+.codify-skeleton {
+  display: block;
+}
+
+.codify-shimmer {
+  display: block;
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  background-color: var(--codify-sunken, #f3f3f3);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.75) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: codify-sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes codify-sweep {
+  0% {
+    background-position: 150% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
+}
+
+.codify-skeleton__lines,
+.codify-skeleton__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.codify-skeleton__line {
+  height: 0.75rem;
+}
+
+.codify-skeleton__row,
+.codify-skeleton__block {
+  width: 100%;
+}
+
+/* Matches codifyKpiCard's loaded rhythm: eyebrow, value, bar, meta. */
+.codify-skeleton__kpi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.codify-skeleton__eyebrow {
+  height: 0.625rem;
+  width: 45%;
+}
+
+.codify-skeleton__value {
+  height: 2rem;
+  width: 3.5rem;
+}
+
+.codify-skeleton__bar {
+  height: 0.375rem;
+  width: 100%;
+}
+
+.codify-skeleton__meta {
+  height: 0.625rem;
+  width: 70%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .codify-shimmer {
+    animation: none;
+    background-image: none;
+  }
+}

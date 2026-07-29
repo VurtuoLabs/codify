@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <isExposed>false</isExposed>
+    <masterLabel>Codify Ranked Bars</masterLabel>
+    <description
+  >Shared quiet ranked bar list with no chart chrome, plus its own skeleton and empty state. Used for root causes, technicians and change types.</description>
+</LightningComponentBundle>

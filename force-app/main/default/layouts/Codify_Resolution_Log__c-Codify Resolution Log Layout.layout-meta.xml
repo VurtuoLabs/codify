@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  This is the object's default layout, replaced in place rather than added
+  alongside: a custom object's auto-created layout is always named
+  "<Object Label> Layout", so deploying this name updates the existing one and
+  keeps every profile's existing layout assignment.
+
+  It exists for one reason the FlexiPage cannot cover on its own: related lists
+  on a Lightning record page are drawn from the layout's related list
+  definitions. Without the relatedLists blocks below, the Related tab on
+  Codify_Resolution_Log_Record_Page has nothing to render. The field sections
+  mirror the record page so the Classic view and the edit form read the same way.
+-->
+<Layout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <layoutSections>
+        <customLabel>true</customLabel>
+        <detailHeading>true</detailHeading>
+        <editHeading>true</editHeading>
+        <label>Diagnosis</label>
+        <layoutColumns>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Root_Cause_Category__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Root_Cause_Confidence__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Low_Confidence__c</field>
+            </layoutItems>
+        </layoutColumns>
+        <layoutColumns>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Case__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Article_Drafted__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Related_Cases_Flagged__c</field>
+            </layoutItems>
+        </layoutColumns>
+        <style>TwoColumnsTopToBottom</style>
+    </layoutSections>
+    <layoutSections>
+        <customLabel>true</customLabel>
+        <detailHeading>true</detailHeading>
+        <editHeading>true</editHeading>
+        <label>The fix, as described</label>
+        <layoutColumns>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Resolution_Summary__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Resolution_Recap__c</field>
+            </layoutItems>
+        </layoutColumns>
+        <style>OneColumn</style>
+    </layoutSections>
+    <layoutSections>
+        <customLabel>true</customLabel>
+        <detailHeading>true</detailHeading>
+        <editHeading>true</editHeading>
+        <label>Provenance and downstream output</label>
+        <layoutColumns>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Logged_By_Technician__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Source_Channel__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>Name</field>
+            </layoutItems>
+        </layoutColumns>
+        <layoutColumns>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Knowledge_Article_Id__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Root_Cause_Key__c</field>
+            </layoutItems>
+        </layoutColumns>
+        <style>TwoColumnsTopToBottom</style>
+    </layoutSections>
+    <layoutSections>
+        <customLabel>true</customLabel>
+        <detailHeading>true</detailHeading>
+        <editHeading>true</editHeading>
+        <label>Cached extraction</label>
+        <layoutColumns>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Extraction_JSON__c</field>
+            </layoutItems>
+        </layoutColumns>
+        <style>OneColumn</style>
+    </layoutSections>
+    <!-- Backed by Codify_Change_Log__c.Source_Resolution_Log__c. -->
+    <relatedLists>
+        <fields>NAME</fields>
+        <fields>Change_Type__c</fields>
+        <fields>Object_API_Name__c</fields>
+        <fields>Related_Record_Name__c</fields>
+        <fields>Field_Name__c</fields>
+        <fields>Requires_Human_Review__c</fields>
+        <relatedList>Codify_Change_Log__c.Source_Resolution_Log__c</relatedList>
+    </relatedLists>
+    <!-- Backed by Case.Codify_Source_Resolution_Log__c. -->
+    <relatedLists>
+        <fields>CASES.CASE_NUMBER</fields>
+        <fields>CASES.SUBJECT</fields>
+        <fields>Codify_Root_Cause__c</fields>
+        <fields>CASES.STATUS</fields>
+        <relatedList>Case.Codify_Source_Resolution_Log__c</relatedList>
+    </relatedLists>
+</Layout>

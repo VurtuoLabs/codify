@@ -1,0 +1,59 @@
+.codify-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.codify-empty_compact {
+  padding: var(--slds-g-spacing-6, 2rem) var(--slds-g-spacing-4, 1rem);
+  min-height: 11rem;
+}
+
+.codify-empty_page {
+  padding: var(--slds-g-spacing-8, 3rem) var(--slds-g-spacing-4, 1rem);
+  min-height: 18rem;
+}
+
+/* A quiet ring rather than a large illustration: the icon is orientation, not
+   decoration, so it stays small and low contrast. */
+.codify-empty__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  background: var(--codify-sunken, #f3f3f3);
+  border: 1px solid var(--codify-line, #e5e5e5);
+}
+
+.codify-empty__icon {
+  --slds-c-icon-color-foreground: var(--codify-accent, #0f766e);
+  --slds-c-icon-color-foreground-default: var(--codify-accent, #0f766e);
+}
+
+.codify-empty__title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--codify-ink, #1c1a17);
+}
+
+.codify-empty__message {
+  margin: 0;
+  max-width: 34rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--codify-muted, #6f6a62);
+}
+
+.codify-empty__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  margin-top: var(--slds-g-spacing-2, 0.5rem);
+}

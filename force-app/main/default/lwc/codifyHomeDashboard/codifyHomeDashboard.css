@@ -1,207 +1,551 @@
-/*
-  Codify Home.
+/* ═══════════════════════════════════════════════════════════════════════════
+   Codify - "editorial review desk"
 
-  One card treatment, one card size, used for every measure on the page. There
-  are no width spans and no variants: the grid rows are all 1fr and the cards
-  stretch to fill them, so the edges line up whatever the content.
+   Teal and emerald ink on warm near-neutral paper. Deliberately not a blue SLDS
+   dashboard, and deliberately not the amber, indigo, rose or violet of its
+   sibling apps: Codify's job is turning finished work into written knowledge, so
+   it is styled like a copy desk - paper stock, an editorial eyebrow above every
+   heading, hairline rules instead of heavy chrome, and one serif surface for the
+   thing actually being read (see codifyArticleReviewPanel).
 
-  What keeps that from leaving dead space inside the shorter cards is that each
-  card is a flex column with its closing note pushed to the bottom, and the lists
-  and sparkline flex to fill — so the extra height is absorbed rather than left
-  as a gap.
+   TOKENS are declared on :host of each top-level component rather than in a
+   global stylesheet, because LWC styles are scoped and global CSS is not
+   allowed here. Custom properties do inherit across shadow boundaries, so the
+   shared child components (KPI card, badges, skeletons) read these values, and
+   they carry the same literals as fallbacks so they still render correctly if
+   used on their own.
 
-  Colours come from SLDS styling hooks with literal fallbacks, so the page still
-  holds up in an org that has themed its hooks differently.
-*/
+   Spacing and radius defer to SLDS global styling hooks with literal fallbacks,
+   so an org that has retuned its scale keeps consistent rhythm here.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 :host {
+  /* Paper and ink */
+  --codify-paper: #ffffff;
+  --codify-surface: #ffffff;
+  --codify-sunken: #f3f3f3;
+  --codify-ink: #1c1a17;
+  --codify-ink-soft: #46423c;
+  --codify-muted: #6f6a62;
+  --codify-line: #e5e5e5;
+  --codify-line-strong: #c9c9c9;
+
+  /* Accent: teal for what Codify did, emerald for what reached Knowledge */
+  --codify-accent: #0f766e;
+  --codify-accent-strong: #115e59;
+  --codify-accent-ink: #134e4a;
+  --codify-accent-soft: #5eada6;
+  --codify-accent-tint: #e6f4f1;
+  --codify-good: #047857;
+  --codify-good-tint: #e7f3ec;
+
+  /* Waiting on a person is graphite, not amber: it is normal work, not an alarm */
+  --codify-pending: #4b5563;
+  --codify-pending-tint: #eeeeec;
+  --codify-critical: #b42318;
+  --codify-critical-tint: #fbeceb;
+
+  --codify-shadow: 0 1px 2px rgba(28, 26, 23, 0.06);
+  --codify-serif:
+    "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
+    "Times New Roman", serif;
+
   display: block;
-  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+  background: var(--codify-paper);
 }
 
-.codify-home {
-  --codify-ink: #0b0f14;
-  --codify-accent: #0176d3;
-  --codify-accent-soft: #5eb0ff;
-  --codify-deep: #04487f;
-  --codify-warn: #fe9339;
-  --codify-good: #2e844a;
-  --codify-line: var(--slds-g-color-border-base-1, #e5e5e5);
-  --codify-surface: var(--slds-g-color-neutral-base-100, #fff);
-  --codify-muted: var(--slds-g-color-neutral-base-40, #5c5c5c);
-  --codify-track: var(--slds-g-color-neutral-base-95, #f3f3f3);
-  padding-bottom: 1rem;
+.codify-desk {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-5, 1.5rem);
+  padding: var(--slds-g-spacing-5, 1.5rem) var(--slds-g-spacing-4, 1rem)
+    var(--slds-g-spacing-6, 2rem);
+  color: var(--codify-ink);
 }
 
-/* ── Grid ─────────────────────────────────────────────────────────────── */
+/* ── Masthead ─────────────────────────────────────────────────────────────── */
+.codify-masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--slds-g-spacing-4, 1rem);
+  padding-bottom: var(--slds-g-spacing-3, 0.75rem);
+  border-bottom: 2px solid var(--codify-ink);
+}
+
+/* Lets the masthead copy shrink before the actions wrap, rather than pushing
+   the page into horizontal overflow on a narrow viewport. */
+.codify-masthead__copy {
+  flex: 1 1 20rem;
+  min-width: 0;
+}
+
+.codify-masthead__eyebrow {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--codify-accent);
+}
+
+.codify-masthead__title {
+  margin: 0.125rem 0 0;
+  font-family: var(--codify-serif);
+  font-size: 2rem;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--codify-ink);
+}
+
+.codify-masthead__lede {
+  margin: 0.375rem 0 0;
+  max-width: 56ch;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--codify-muted);
+}
+
+.codify-masthead__aside {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+}
+
+.codify-masthead__stamp {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--codify-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Inline spinner beside the button it belongs to rather than an overlay, so a
+   refresh never blocks reading what is already on screen. */
+.codify-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.codify-action__spinner {
+  position: relative;
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* ── The attention band ───────────────────────────────────────────────────── */
+.codify-band {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-4, 1rem);
+  padding: var(--slds-g-spacing-4, 1rem);
+  background: var(--codify-surface);
+  border: 1px solid var(--codify-line);
+  border-top: 0.1875rem solid var(--codify-accent);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  box-shadow: var(--codify-shadow);
+}
+
+.codify-band__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--slds-g-spacing-4, 1rem);
+  align-items: stretch;
+}
+
+/* The hero figure takes two tracks on anything wider than a phone, so the one
+   number a reviewer must see is unmistakably first. */
+@media (min-width: 48em) {
+  .codify-band__grid {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+}
+
+/* ── Cards and grids ──────────────────────────────────────────────────────── */
 .codify-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr));
-  grid-auto-rows: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: var(--slds-g-spacing-4, 1rem);
   align-items: stretch;
-  gap: 1rem;
-  padding: 1rem;
 }
 
-/* ── The one card: no variants, no spans ──────────────────────────────── */
+@media (min-width: 64em) {
+  .codify-grid_split {
+    grid-template-columns: 3fr 2fr;
+  }
+}
+
+.codify-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-4, 1rem);
+}
+
 .codify-card {
   display: flex;
   flex-direction: column;
+  padding: var(--slds-g-spacing-4, 1rem);
   background: var(--codify-surface);
   border: 1px solid var(--codify-line);
-  border-radius: var(--slds-g-radius-border-3, 0.5rem);
-  padding: 1.1rem 1.15rem 1.2rem;
-  min-height: 11rem;
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  box-shadow: var(--codify-shadow);
 }
 
-.codify-card__title {
+.codify-card_quiet {
+  box-shadow: none;
+}
+
+.codify-card__body {
+  padding-top: var(--slds-g-spacing-4, 1rem);
+  flex: 1;
+}
+
+.codify-card__subtitle {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--codify-ink);
 }
 
-.codify-card__value {
-  margin: 0.45rem 0 0.55rem;
-  font-size: 2.25rem;
-  line-height: 1;
-  font-weight: 700;
-  color: var(--codify-ink);
-  font-variant-numeric: tabular-nums;
-}
-
-.codify-card__meta {
-  margin: 0.35rem 0 0;
-  font-size: 0.72rem;
+.codify-card__caption {
+  margin: 0.125rem 0 0;
+  font-size: 0.75rem;
   color: var(--codify-muted);
 }
 
-/* Pinned to the bottom so the closing line sits on a common baseline across
-   the row, whatever height the grid settles on. */
 .codify-card__note {
-  margin: 0.5rem 0 0;
-  padding-top: 0.5rem;
-  font-size: 0.72rem;
+  margin: var(--slds-g-spacing-3, 0.75rem) 0 0;
+  font-size: 0.75rem;
   line-height: 1.5;
   color: var(--codify-muted);
-  margin-top: auto;
 }
 
-.codify-empty {
-  margin: 0.6rem 0 0;
-  font-size: 0.78rem;
+.codify-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+}
+
+/* Expanding a section fades and settles its content; collapsing is immediate,
+   because animating something away only delays the reader. */
+.codify-collapse {
+  animation: codify-expand 200ms cubic-bezier(0.3, 0, 0.2, 1) both;
+}
+
+@keyframes codify-expand {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Pipeline ─────────────────────────────────────────────────────────────── */
+.codify-pipeline {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--slds-g-spacing-5, 1.5rem);
+  align-items: center;
+}
+
+@media (min-width: 40em) {
+  .codify-pipeline {
+    grid-template-columns: 1fr auto;
+  }
+}
+
+.codify-stages {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+}
+
+.codify-stage__row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: baseline;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.codify-stage__label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--codify-ink);
+}
+
+.codify-stage__count {
+  font-size: 1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--codify-ink);
+}
+
+.codify-stage__percent {
+  min-width: 2.5rem;
+  text-align: right;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   color: var(--codify-muted);
 }
 
-.codify-empty_page {
-  padding: 0 1rem 1rem;
-}
-
-/* ── Bars, shared by the stat cards and the ranked lists ──────────────── */
-.codify-track {
+.codify-stage__track {
   display: block;
-  background: var(--codify-track);
+  height: 0.5rem;
+  margin-top: 0.25rem;
   border-radius: 999px;
-  height: 0.45rem;
+  background: var(--codify-sunken);
   overflow: hidden;
 }
 
-.codify-bar {
+.codify-stage__bar {
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: var(--codify-accent);
-  transition: width 0.4s ease;
+  transition: width 240ms cubic-bezier(0.3, 0, 0.2, 1);
 }
 
-/* Pipeline stages get progressively lighter, so depth reads at a glance. */
-.codify-bar_described {
-  background: var(--codify-ink);
+/* The pipeline reads top to bottom in one hue family, graphite at capture and
+   emerald once it is live, so depth is visible without a legend. */
+.codify-stage__bar_ink {
+  background: var(--codify-ink-soft);
 }
-.codify-bar_tagged {
-  background: var(--codify-deep);
-}
-.codify-bar_drafted {
+.codify-stage__bar_accent {
   background: var(--codify-accent);
 }
-.codify-bar_published {
+.codify-stage__bar_accent-soft {
   background: var(--codify-accent-soft);
 }
-
-/* Outstanding work and reach: same bar, different reading. */
-.codify-bar_warn {
-  background: var(--codify-warn);
-}
-.codify-bar_good {
+.codify-stage__bar_good {
   background: var(--codify-good);
 }
 
-.codify-card__value_warn {
-  color: var(--codify-warn);
-}
-.codify-card__value_good {
-  color: var(--codify-good);
-}
-
-/* ── Ranked bar lists ─────────────────────────────────────────────────── */
-.codify-bars {
-  margin: 0.7rem 0 0;
-  padding: 0;
-  list-style: none;
-  flex: 1;
+.codify-stage__note {
+  margin: 0.1875rem 0 0;
+  font-size: 0.6875rem;
+  color: var(--codify-muted);
 }
 
-.codify-bars__row {
-  display: grid;
-  grid-template-columns: minmax(6rem, 1fr) minmax(3rem, 1.2fr) auto;
+/* ── Coverage ring ────────────────────────────────────────────────────────── */
+.codify-coverage {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.3rem 0;
+  text-align: center;
+  gap: 0.125rem;
+  padding-left: var(--slds-g-spacing-4, 1rem);
+  border-left: 1px solid var(--codify-line);
 }
 
-.codify-bars__label {
-  font-size: 0.75rem;
-  line-height: 1.3;
+@media (max-width: 39.9375em) {
+  .codify-coverage {
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--codify-line);
+    padding-top: var(--slds-g-spacing-4, 1rem);
+  }
+}
+
+.codify-coverage__ring {
+  width: 6rem;
+  height: 6rem;
+  transform: rotate(-90deg);
+}
+
+/* r=15.9155 makes the circumference exactly 100, so the dash array can be
+   written straight in percentage points. */
+.codify-coverage__track,
+.codify-coverage__value {
+  fill: none;
+  stroke-width: 3;
+}
+
+.codify-coverage__track {
+  stroke: var(--codify-sunken);
+}
+
+.codify-coverage__value {
+  stroke: var(--codify-good);
+  stroke-linecap: round;
+  transition: stroke-dasharray 260ms cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+.codify-coverage__figure {
+  margin: -0.5rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
   color: var(--codify-ink);
 }
 
-.codify-bars__count {
-  font-size: 0.75rem;
-  font-weight: 700;
+.codify-coverage__unit {
+  font-size: 0.875rem;
   color: var(--codify-muted);
-  font-variant-numeric: tabular-nums;
 }
 
-/* ── Sparkline ────────────────────────────────────────────────────────── */
+.codify-coverage__label {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--codify-muted);
+}
+
+.codify-coverage__note {
+  margin: 0.25rem 0 0;
+  max-width: 20ch;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--codify-muted);
+}
+
+/* ── Cadence: seven small multiples ───────────────────────────────────────── */
 .codify-spark {
-  display: flex;
-  align-items: flex-end;
-  gap: 0.35rem;
-  flex: 1;
-  min-height: 5rem;
-  margin-top: 0.7rem;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  align-items: end;
+  height: 7rem;
 }
 
 .codify-spark__col {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
   height: 100%;
-}
-
-.codify-spark__fill {
-  width: 100%;
-  border-radius: var(--slds-g-radius-border-1, 0.125rem)
-    var(--slds-g-radius-border-1, 0.125rem) 0 0;
-  background: var(--codify-accent);
-  transition: height 0.4s ease;
+  gap: 0.1875rem;
 }
 
 .codify-spark__count {
-  margin-top: 0.3rem;
-  font-size: 0.68rem;
-  color: var(--codify-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
+  color: var(--codify-muted);
+}
+
+.codify-spark__slot {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  flex: 1;
+}
+
+.codify-spark__fill {
+  display: block;
+  width: 100%;
+  min-height: 0.125rem;
+  border-radius: var(--slds-g-radius-border-1, 0.125rem)
+    var(--slds-g-radius-border-1, 0.125rem) 0 0;
+  background: var(--codify-accent-soft);
+  transition: height 240ms cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+.codify-spark__fill_today {
+  background: var(--codify-accent);
+}
+
+.codify-spark__day {
+  font-size: 0.625rem;
+  color: var(--codify-muted);
+}
+
+/* ── Audit timeline ───────────────────────────────────────────────────────── */
+.codify-timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.codify-timeline__item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+  padding: var(--slds-g-spacing-3, 0.75rem) 0;
+  border-bottom: 1px solid var(--codify-line);
+}
+
+.codify-timeline__item:last-child {
+  border-bottom: 0;
+}
+
+/* A ringed dot per entry, so the column reads as one thread of actions rather
+   than a stack of unrelated rows. */
+.codify-timeline__marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: var(--codify-accent-tint);
+  border: 1px solid var(--codify-line);
+}
+
+.codify-timeline__icon {
+  --slds-c-icon-color-foreground: var(--codify-accent-ink);
+  --slds-c-icon-color-foreground-default: var(--codify-accent-ink);
+}
+
+.codify-timeline__body {
+  min-width: 0;
+}
+
+.codify-timeline__title {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--codify-ink);
+  overflow-wrap: anywhere;
+}
+
+.codify-timeline__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0.125rem 0 0;
+  font-size: 0.6875rem;
+  color: var(--codify-muted);
+}
+
+.codify-timeline__aside {
+  display: flex;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+@media (max-width: 30em) {
+  .codify-masthead__title {
+    font-size: 1.625rem;
+  }
+  .codify-timeline__item {
+    grid-template-columns: auto 1fr;
+  }
+  .codify-timeline__aside {
+    grid-column: 2;
+    justify-content: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .codify-collapse,
+  .codify-stage__bar,
+  .codify-spark__fill,
+  .codify-coverage__value {
+    animation: none;
+    transition: none;
+  }
 }

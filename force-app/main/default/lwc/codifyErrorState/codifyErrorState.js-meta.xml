@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <isExposed>false</isExposed>
+    <masterLabel>Codify Error State</masterLabel>
+    <description
+  >Shared error surface: a plain-language explanation and a retry action for the reader, with the raw error kept behind a disclosure for developers.</description>
+</LightningComponentBundle>

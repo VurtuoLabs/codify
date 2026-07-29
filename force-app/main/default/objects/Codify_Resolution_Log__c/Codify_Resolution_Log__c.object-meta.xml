@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!--
+      Assigns Codify_Resolution_Log_Record_Page as the org default record page.
+      A FlexiPage of type RecordPage is inert until something overrides the
+      object's View action: without this the object still opens on the generic
+      layout and the page is invisible to users.
+    -->
+    <actionOverrides>
+        <actionName>View</actionName>
+        <comment
+    >Org default Lightning record page for Codify Resolution Log.</comment>
+        <content>Codify_Resolution_Log_Record_Page</content>
+        <formFactor>Large</formFactor>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Flexipage</type>
+    </actionOverrides>
+    <compactLayoutAssignment
+  >Codify_Resolution_Log_Compact</compactLayoutAssignment>
     <deploymentStatus>Deployed</deploymentStatus>
     <description
   >The raw recap history. One record per fix a technician described to Codify, holding the verbatim recap, the extracted resolution summary and root cause, and whether a Knowledge draft came out of it. Every Change Log row traces back to one of these.</description>

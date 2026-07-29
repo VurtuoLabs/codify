@@ -1,0 +1,41 @@
+<template>
+  <div class={containerClass} role="alert">
+    <div class="codify-error__head">
+      <lightning-icon
+        icon-name="utility:error"
+        size="x-small"
+        alternative-text="Error"
+        class="codify-error__icon"
+      ></lightning-icon>
+      <div class="codify-error__copy">
+        <p class="codify-error__title">{title}</p>
+        <p class="codify-error__message">{friendlyMessage}</p>
+      </div>
+    </div>
+
+    <div class="codify-error__actions">
+      <template lwc:if={showRetry}>
+        <lightning-button
+          variant="brand"
+          label={retryButtonLabel}
+          icon-name="utility:refresh"
+          disabled={retrying}
+          onclick={handleRetry}
+        ></lightning-button>
+      </template>
+
+      <template lwc:if={detail}>
+        <lightning-button
+          variant="base"
+          label={detailToggleLabel}
+          aria-expanded={detailExpandedString}
+          onclick={toggleDetail}
+        ></lightning-button>
+      </template>
+    </div>
+
+    <template lwc:if={detailExpanded}>
+      <pre class="codify-error__detail">{detail}</pre>
+    </template>
+  </div>
+</template>

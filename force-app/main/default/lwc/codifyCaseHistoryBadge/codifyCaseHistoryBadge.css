@@ -1,0 +1,241 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Case History Badge - an editor's annotation in the margin of the Case page.
+
+   This component lives on a standard record page next to Salesforce's own
+   components, so it stays deliberately quiet: no card chrome of its own beyond a
+   hairline and a teal edge, which is enough to read as "Codify wrote this" while
+   sitting inside whatever page layout it lands in.
+
+   Tokens are declared here per component because LWC CSS is scoped; see
+   codifyHomeDashboard.css for the reasoning.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:host {
+  --codify-surface: #ffffff;
+  --codify-sunken: #f3f3f3;
+  --codify-ink: #1c1a17;
+  --codify-ink-soft: #46423c;
+  --codify-muted: #6f6a62;
+  --codify-line: #e5e5e5;
+  --codify-line-strong: #c9c9c9;
+
+  --codify-accent: #0f766e;
+  --codify-accent-strong: #115e59;
+  --codify-accent-ink: #134e4a;
+  --codify-accent-soft: #5eada6;
+  --codify-accent-tint: #e6f4f1;
+  --codify-good: #047857;
+  --codify-good-tint: #e7f3ec;
+
+  --codify-pending: #4b5563;
+  --codify-pending-tint: #eeeeec;
+  --codify-critical: #b42318;
+  --codify-critical-tint: #fbeceb;
+
+  --codify-serif:
+    "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
+    "Times New Roman", serif;
+
+  display: block;
+}
+
+.codify-note {
+  padding: var(--slds-g-spacing-3, 0.75rem);
+  background: var(--codify-surface);
+  border: 1px solid var(--codify-line);
+  border-left: 0.1875rem solid var(--codify-accent);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  animation: codify-fade-in 180ms cubic-bezier(0.3, 0, 0.2, 1) both;
+}
+
+.codify-note_loading {
+  animation: none;
+}
+
+@keyframes codify-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.codify-note__head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+}
+
+.codify-note__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: var(--codify-accent-tint);
+}
+
+.codify-note__icon {
+  --slds-c-icon-color-foreground: var(--codify-accent-ink);
+  --slds-c-icon-color-foreground-default: var(--codify-accent-ink);
+}
+
+.codify-note__copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.codify-note__headline {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--codify-ink);
+}
+
+.codify-note__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.375rem;
+}
+
+.codify-note__badges:empty {
+  display: none;
+}
+
+.codify-note__detail {
+  margin-top: var(--slds-g-spacing-3, 0.75rem);
+  padding-top: var(--slds-g-spacing-3, 0.75rem);
+  border-top: 1px solid var(--codify-line);
+  animation: codify-expand 200ms cubic-bezier(0.3, 0, 0.2, 1) both;
+}
+
+@keyframes codify-expand {
+  from {
+    opacity: 0;
+    transform: translateY(-0.1875rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── The thread of changes ────────────────────────────────────────────────── */
+.codify-thread {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.codify-thread__item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  align-items: start;
+  padding: var(--slds-g-spacing-2, 0.5rem) 0;
+  border-bottom: 1px solid var(--codify-line);
+}
+
+.codify-thread__item:last-child {
+  border-bottom: 0;
+}
+
+.codify-thread__marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  margin-top: 0.0625rem;
+  border-radius: 999px;
+  background: var(--codify-sunken);
+  border: 1px solid var(--codify-line);
+}
+
+.codify-thread__icon {
+  --slds-c-icon-color-foreground: var(--codify-accent-ink);
+  --slds-c-icon-color-foreground-default: var(--codify-accent-ink);
+}
+
+.codify-thread__body {
+  min-width: 0;
+}
+
+.codify-thread__title {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--codify-ink);
+  overflow-wrap: anywhere;
+}
+
+.codify-thread__diff {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0.125rem 0 0;
+  font-size: 0.75rem;
+}
+
+.codify-thread__old {
+  color: var(--codify-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--codify-line-strong);
+}
+
+.codify-thread__arrow {
+  --slds-c-icon-color-foreground: var(--codify-accent);
+  --slds-c-icon-color-foreground-default: var(--codify-accent);
+  align-self: center;
+}
+
+.codify-thread__new {
+  font-weight: 600;
+  color: var(--codify-ink);
+}
+
+.codify-thread__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0.125rem 0 0;
+  font-size: 0.6875rem;
+  color: var(--codify-muted);
+}
+
+.codify-thread__aside {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 30em) {
+  .codify-note__head {
+    flex-wrap: wrap;
+  }
+
+  .codify-thread__item {
+    grid-template-columns: auto 1fr;
+  }
+
+  .codify-thread__aside {
+    grid-column: 2;
+    justify-content: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .codify-note,
+  .codify-note__detail {
+    animation: none;
+  }
+}

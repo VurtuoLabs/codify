@@ -1,44 +1,216 @@
 <template>
-  <lightning-card title="Root Cause Trends" icon-name="standard:topic">
-    <div slot="actions">
-      <lightning-combobox
-        label="Window"
-        variant="label-hidden"
-        value={daysBack}
-        options={windowOptions}
-        onchange={handleWindow}
-      ></lightning-combobox>
+  <div class="codify-desk">
+    <header class="codify-masthead">
+      <div class="codify-masthead__copy">
+        <p class="codify-masthead__eyebrow">Codify</p>
+        <h1 class="codify-masthead__title">Root cause trends</h1>
+        <p class="codify-masthead__lede">
+          What keeps coming back, and whether Knowledge has caught up with it. A
+          cause that recurs with no article behind it is a documentation gap.
+        </p>
+      </div>
+      <div class="codify-action">
+        <lightning-button
+          label={refreshLabel}
+          icon-name="utility:refresh"
+          variant="neutral"
+          disabled={isRefreshing}
+          onclick={handleRefresh}
+        ></lightning-button>
+        <template lwc:if={isRefreshing}>
+          <span class="codify-action__spinner">
+            <lightning-spinner
+              size="x-small"
+              variant="brand"
+              alternative-text="Refreshing trends"
+            ></lightning-spinner>
+          </span>
+        </template>
+      </div>
+    </header>
+
+    <!-- The three figures that decide whether this tab needs action -->
+    <div class="codify-kpis">
+      <c-codify-kpi-card
+        tone={gapTone}
+        label="Coverage gaps"
+        value={gapCount}
+        icon-name="utility:warning"
+        supporting-text={gapSupportingText}
+        loading={isFetching}
+      ></c-codify-kpi-card>
+
+      <c-codify-kpi-card
+        tone="accent"
+        label="Recurring causes"
+        value={recurringCount}
+        icon-name="utility:refresh"
+        supporting-text={recurringSupportingText}
+        loading={isFetching}
+      ></c-codify-kpi-card>
+
+      <c-codify-kpi-card
+        tone="good"
+        label="Cases reached by the sweep"
+        value={casesReached}
+        icon-name="utility:share"
+        supporting-text="Other open Cases given a suggested fix because they shared one of these causes."
+        loading={isFetching}
+      ></c-codify-kpi-card>
     </div>
 
-    <div class="slds-p-horizontal_medium slds-p-bottom_small">
-      <p class={gapClass}>{gapLabel}</p>
-    </div>
-
-    <template if:true={error}>
-      <div class="slds-p-horizontal_medium slds-text-color_error" role="alert">
-        {error}
-      </div>
-    </template>
-
-    <template if:true={hasRows}>
-      <div class="slds-p-horizontal_x-small codify-trends-table">
-        <lightning-datatable
-          key-field="rootCause"
-          data={rows}
-          columns={columns}
-          hide-checkbox-column
-          column-widths-mode="auto"
-        >
-        </lightning-datatable>
-      </div>
-    </template>
-
-    <template if:false={hasRows}>
-      <div
-        class="slds-p-around_large slds-align_absolute-center slds-text-color_weak"
+    <section class="codify-card">
+      <c-codify-section-header
+        eyebrow="Ranked"
+        title="Every cause Codify tagged"
+        description={listDescription}
+        icon-name="utility:chart"
+        count={resultCountLabel}
       >
-        No root causes tagged in this window yet.
+        <div slot="actions" class="codify-filters">
+          <div class="codify-filters__search">
+            <lightning-input
+              type="search"
+              label="Search root causes"
+              variant="label-hidden"
+              placeholder="Search root causes…"
+              value={searchTerm}
+              onchange={handleSearch}
+            ></lightning-input>
+          </div>
+          <div class="codify-filters__control">
+            <lightning-combobox
+              label="Sort by"
+              variant="label-hidden"
+              value={sortBy}
+              options={sortOptions}
+              onchange={handleSort}
+            ></lightning-combobox>
+          </div>
+          <div class="codify-filters__control">
+            <lightning-combobox
+              label="Time window"
+              variant="label-hidden"
+              value={daysBack}
+              options={windowOptions}
+              onchange={handleWindow}
+            ></lightning-combobox>
+          </div>
+        </div>
+      </c-codify-section-header>
+
+      <div class="codify-card__body">
+        <template lwc:if={error}>
+          <c-codify-error-state
+            title="The trends could not load"
+            message={error.message}
+            detail={error.detail}
+            show-retry
+            retrying={isFetching}
+            onretry={handleRetry}
+          ></c-codify-error-state>
+        </template>
+
+        <template lwc:elseif={isFetching}>
+          <c-codify-skeleton-loader
+            variant="rows"
+            count="6"
+            height="4.5rem"
+            assistive-text="Loading root cause trends"
+          ></c-codify-skeleton-loader>
+        </template>
+
+        <template lwc:elseif={hasRows}>
+          <div class="codify-rank">
+            <!-- Column headings, desktop only: below 48em each row becomes its
+                 own labelled block and these would be lying about the layout. -->
+            <div class="codify-rank__head" aria-hidden="true">
+              <span class="codify-rank__head-cell">Root cause</span>
+              <span class="codify-rank__head-cell">Cases resolved</span>
+              <span class="codify-rank__head-cell">What it produced</span>
+              <span class="codify-rank__head-cell">Last seen</span>
+            </div>
+
+            <ul class="codify-rank__list">
+              <template for:each={displayRows} for:item="row">
+                <li key={row.rootCause} class="codify-rank__row">
+                  <div class="codify-rank__id">
+                    <p class="codify-rank__label">
+                      <span class="codify-rank__index" aria-hidden="true"
+                        >{row.rank}</span
+                      >
+                      <span>{row.rootCause}</span>
+                    </p>
+                    <c-codify-status-badge
+                      label={row.coverage.label}
+                      tone={row.coverage.tone}
+                      icon-name={row.coverage.icon}
+                      assistive-prefix="Coverage:"
+                      compact
+                    ></c-codify-status-badge>
+                  </div>
+
+                  <div class="codify-rank__main">
+                    <span class="codify-rank__track" aria-hidden="true">
+                      <span
+                        class="codify-rank__bar"
+                        style={row.barStyle}
+                      ></span>
+                    </span>
+                    <span class="codify-rank__count">{row.occurrences}</span>
+                  </div>
+
+                  <div class="codify-micro">
+                    <template for:each={row.multiples} for:item="m">
+                      <div key={m.key} class="codify-micro__row">
+                        <span class="codify-micro__label">{m.label}</span>
+                        <span class="codify-micro__track" aria-hidden="true">
+                          <span class={m.barClass} style={m.style}></span>
+                        </span>
+                        <span class="codify-micro__value">{m.value}</span>
+                      </div>
+                    </template>
+                  </div>
+
+                  <div class="codify-rank__seen">
+                    <span class="codify-rank__seen-label">Last seen</span>
+                    <lightning-formatted-date-time
+                      value={row.lastSeen}
+                      year="numeric"
+                      month="short"
+                      day="numeric"
+                    ></lightning-formatted-date-time>
+                  </div>
+
+                  <span class="slds-assistive-text">{row.srSummary}</span>
+                </li>
+              </template>
+            </ul>
+
+            <template lwc:if={canExpand}>
+              <div class="codify-rank__more">
+                <lightning-button
+                  variant="base"
+                  label={expandLabel}
+                  icon-name="utility:chevrondown"
+                  icon-position="right"
+                  onclick={handleShowAll}
+                ></lightning-button>
+              </div>
+            </template>
+          </div>
+        </template>
+
+        <template lwc:else>
+          <c-codify-empty-state
+            icon-name="utility:tag"
+            title="No root causes to rank"
+            message={emptyMessage}
+            action-label={emptyActionLabel}
+            onaction={handleClearSearch}
+          ></c-codify-empty-state>
+        </template>
       </div>
-    </template>
-  </lightning-card>
+    </section>
+  </div>
 </template>

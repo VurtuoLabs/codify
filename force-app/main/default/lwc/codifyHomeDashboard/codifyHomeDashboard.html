@@ -1,122 +1,418 @@
 <template>
-  <div class="codify-home">
-    <template if:true={error}>
-      <div class="slds-text-color_error slds-p-around_small" role="alert">
-        {error}
+  <div class="codify-desk">
+    <!-- ── Masthead ─────────────────────────────────────────────────────── -->
+    <header class="codify-masthead">
+      <div class="codify-masthead__copy">
+        <p class="codify-masthead__eyebrow">Codify</p>
+        <h1 class="codify-masthead__title">Review desk</h1>
+        <p class="codify-masthead__lede">
+          Every fix a technician described, what Codify did with it, and what is
+          still waiting on a person.
+        </p>
       </div>
-    </template>
 
-    <div class="codify-grid">
-      <section class="codify-card">
-        <h2 class="codify-card__title">What Codify did</h2>
-        <p class="codify-card__meta">Audited actions this week, by type.</p>
-        <template if:true={hasChangeTypes}>
-          <ul class="codify-bars">
-            <template for:each={changeTypeBars} for:item="b">
-              <li key={b.label} class="codify-bars__row">
-                <span class="codify-bars__label" title={b.label}
-                  >{b.label}</span
-                >
-                <span class="codify-track">
-                  <span
-                    class="codify-bar codify-bar_published"
-                    style={b.style}
-                  ></span>
-                </span>
-                <span class="codify-bars__count">{b.count}</span>
-              </li>
-            </template>
-          </ul>
+      <div class="codify-masthead__aside">
+        <template lwc:if={summary}>
+          <c-codify-status-badge
+            label={waitingBadgeLabel}
+            tone={waitingBadgeTone}
+            assistive-prefix="Status:"
+          ></c-codify-status-badge>
         </template>
-        <template if:false={hasChangeTypes}>
-          <p class="codify-empty">Nothing recorded this week.</p>
-        </template>
-      </section>
-
-      <section class="codify-card">
-        <h2 class="codify-card__title">What keeps breaking</h2>
-        <p class="codify-card__meta">Root causes, last 90 days.</p>
-        <template if:true={hasRootCauses}>
-          <ul class="codify-bars">
-            <template for:each={rootCauseBars} for:item="b">
-              <li key={b.label} class="codify-bars__row">
-                <span class="codify-bars__label" title={b.label}
-                  >{b.label}</span
-                >
-                <span class="codify-track">
-                  <span
-                    class="codify-bar codify-bar_drafted"
-                    style={b.style}
-                  ></span>
-                </span>
-                <span class="codify-bars__count">{b.count}</span>
-              </li>
-            </template>
-          </ul>
-        </template>
-        <template if:false={hasRootCauses}>
-          <p class="codify-empty">Nothing tagged yet.</p>
-        </template>
-      </section>
-
-      <!-- Eight measures, one markup block. Successes and outstanding work sit
-           in the same grid on purpose; both are equally the point. -->
-      <template for:each={statCards} for:item="c">
-        <section key={c.key} class="codify-card">
-          <h2 class="codify-card__title">{c.title}</h2>
-          <p class={c.valueClass}>{c.value}</p>
-          <div class="codify-track">
-            <div class={c.barClass} style={c.style}></div>
-          </div>
-          <p class="codify-card__meta">{c.meta}</p>
-          <p class="codify-card__note">{c.note}</p>
-        </section>
-      </template>
-
-      <section class="codify-card">
-        <h2 class="codify-card__title">Who's capturing fixes</h2>
-        <p class="codify-card__meta">Recaps logged this week.</p>
-        <template if:true={hasTechnicians}>
-          <ul class="codify-bars">
-            <template for:each={technicianBars} for:item="b">
-              <li key={b.label} class="codify-bars__row">
-                <span class="codify-bars__label" title={b.label}
-                  >{b.label}</span
-                >
-                <span class="codify-track">
-                  <span
-                    class="codify-bar codify-bar_tagged"
-                    style={b.style}
-                  ></span>
-                </span>
-                <span class="codify-bars__count">{b.count}</span>
-              </li>
-            </template>
-          </ul>
-        </template>
-        <template if:false={hasTechnicians}>
-          <p class="codify-empty">No recaps logged this week.</p>
-        </template>
-      </section>
-
-      <section class="codify-card">
-        <h2 class="codify-card__title">Capture cadence</h2>
-        <p class="codify-card__meta">Fixes described, last 7 days.</p>
-        <div class="codify-spark">
-          <template for:each={trend} for:item="t">
-            <div key={t.key} class="codify-spark__col" title={t.label}>
-              <div class="codify-spark__fill" style={t.style}></div>
-              <span class="codify-spark__count">{t.count}</span>
-            </div>
+        <p class="codify-masthead__stamp" aria-live="polite">
+          {lastRefreshedLabel}
+        </p>
+        <div class="codify-action">
+          <lightning-button
+            label={refreshLabel}
+            icon-name="utility:refresh"
+            variant="neutral"
+            disabled={isRefreshing}
+            onclick={handleRefresh}
+          ></lightning-button>
+          <template lwc:if={isRefreshing}>
+            <span class="codify-action__spinner">
+              <lightning-spinner
+                size="x-small"
+                variant="brand"
+                alternative-text="Refreshing figures"
+              ></lightning-spinner>
+            </span>
           </template>
         </div>
-      </section>
-    </div>
+      </div>
+    </header>
 
-    <template if:false={hasData}>
-      <p class="codify-empty codify-empty_page">
-        Nothing captured yet. These fill in as technicians describe fixes.
-      </p>
+    <template lwc:if={summaryError}>
+      <c-codify-error-state
+        title="The review desk could not load"
+        message={summaryError.message}
+        detail={summaryError.detail}
+        show-retry
+        retrying={isRefreshing}
+        size="page"
+        onretry={handleRetrySummary}
+      ></c-codify-error-state>
+    </template>
+
+    <template lwc:else>
+      <!-- ── The decision: what is waiting on a person ─────────────────── -->
+      <section class="codify-band">
+        <c-codify-section-header
+          eyebrow="Waiting on a person"
+          title="Work Codify will not do for you"
+          description="Codify never publishes and never guesses a root cause. These are the figures only a human can clear."
+          icon-name="utility:knowledge_base"
+        >
+          <div slot="actions">
+            <lightning-button
+              variant={reviewButtonVariant}
+              label="Open the review queue"
+              icon-name="utility:forward"
+              icon-position="right"
+              onclick={handleOpenReviews}
+            ></lightning-button>
+          </div>
+        </c-codify-section-header>
+
+        <div class="codify-band__grid">
+          <c-codify-kpi-card
+            size="hero"
+            tone="attention"
+            label="Drafts to review"
+            value={pending}
+            icon-name="utility:knowledge_base"
+            progress={pendingProgress}
+            progress-label="of the drafts Codify has written"
+            supporting-text={pendingSupportingText}
+            loading={isLoading}
+          ></c-codify-kpi-card>
+
+          <c-codify-kpi-card
+            tone="attention"
+            label="Left unclassified"
+            value={untagged}
+            icon-name="utility:tag"
+            supporting-text={untaggedSupportingText}
+            loading={isLoading}
+          ></c-codify-kpi-card>
+
+          <c-codify-kpi-card
+            tone="attention"
+            label="Escalated this week"
+            value={escalations}
+            icon-name="utility:priority"
+            supporting-text={escalationSupportingText}
+            loading={isLoading}
+          ></c-codify-kpi-card>
+        </div>
+      </section>
+
+      <!-- ── Pipeline and cadence ───────────────────────────────────────── -->
+      <div class="codify-grid codify-grid_split">
+        <article class="codify-card">
+          <c-codify-section-header
+            eyebrow="One recap, many outputs"
+            title="The capture pipeline"
+            description="How far each described fix travelled, as a share of every fix captured."
+            icon-name="utility:trail"
+          ></c-codify-section-header>
+
+          <template lwc:if={isLoading}>
+            <div class="codify-card__body">
+              <c-codify-skeleton-loader
+                variant="rows"
+                count="4"
+                height="3.25rem"
+                assistive-text="Loading the capture pipeline"
+              ></c-codify-skeleton-loader>
+            </div>
+          </template>
+
+          <template lwc:else>
+            <div class="codify-card__body codify-pipeline">
+              <ol class="codify-stages">
+                <template for:each={pipelineStages} for:item="stage">
+                  <li key={stage.key} class="codify-stage">
+                    <div class="codify-stage__row">
+                      <span class="codify-stage__label">{stage.label}</span>
+                      <span class="codify-stage__count">{stage.count}</span>
+                      <span class="codify-stage__percent"
+                        >{stage.percentLabel}</span
+                      >
+                    </div>
+                    <span class="codify-stage__track" aria-hidden="true">
+                      <span class={stage.barClass} style={stage.style}></span>
+                    </span>
+                    <span class="slds-assistive-text">{stage.srLabel}</span>
+                    <p class="codify-stage__note">{stage.note}</p>
+                  </li>
+                </template>
+              </ol>
+
+              <!-- Coverage as a single ring: the share of described fixes that
+                   actually reached the knowledge base. -->
+              <div class="codify-coverage">
+                <svg
+                  class="codify-coverage__ring"
+                  viewBox="0 0 40 40"
+                  role="img"
+                  aria-label={coverageNote}
+                >
+                  <circle
+                    class="codify-coverage__track"
+                    cx="20"
+                    cy="20"
+                    r="15.9155"
+                  ></circle>
+                  <circle
+                    class="codify-coverage__value"
+                    cx="20"
+                    cy="20"
+                    r="15.9155"
+                    style={coverageDashStyle}
+                  ></circle>
+                </svg>
+                <p class="codify-coverage__figure">
+                  {coveragePercent}<span class="codify-coverage__unit">%</span>
+                </p>
+                <p class="codify-coverage__label">Knowledge coverage</p>
+                <p class="codify-coverage__note">{coverageNote}</p>
+              </div>
+            </div>
+          </template>
+        </article>
+
+        <div class="codify-stack">
+          <article class="codify-card">
+            <c-codify-section-header
+              eyebrow="Last 7 days"
+              title="Capture cadence"
+              description="Fixes described per day. A quiet day reads as quiet, not absent."
+              icon-name="utility:date_input"
+            ></c-codify-section-header>
+
+            <template lwc:if={isLoading}>
+              <div class="codify-card__body">
+                <c-codify-skeleton-loader
+                  variant="block"
+                  height="7rem"
+                  assistive-text="Loading capture cadence"
+                ></c-codify-skeleton-loader>
+              </div>
+            </template>
+
+            <template lwc:else>
+              <div class="codify-card__body">
+                <div class="codify-spark">
+                  <template for:each={cadence} for:item="day">
+                    <div key={day.key} class="codify-spark__col">
+                      <span class="codify-spark__count">{day.count}</span>
+                      <span class="codify-spark__slot">
+                        <span class={day.columnClass} style={day.style}></span>
+                      </span>
+                      <span class="codify-spark__day" aria-hidden="true"
+                        >{day.short}</span
+                      >
+                      <span class="slds-assistive-text">{day.title}</span>
+                    </div>
+                  </template>
+                </div>
+                <p class="codify-card__note">{cadenceSummary}</p>
+              </div>
+            </template>
+          </article>
+
+          <c-codify-kpi-card
+            tone="good"
+            label="Other cases reached"
+            value={casesFlagged}
+            icon-name="utility:share"
+            supporting-text="Given a suggested fix by the related case sweep this week - suggested, never resolved."
+            loading={isLoading}
+          ></c-codify-kpi-card>
+        </div>
+      </div>
+
+      <!-- ── What the record shows ──────────────────────────────────────── -->
+      <section class="codify-section">
+        <c-codify-section-header
+          eyebrow="Analysis"
+          title="What the record shows"
+          description="Ranked by volume, so the ordering is the point rather than the exact bar length."
+          icon-name="utility:chart"
+          collapsible
+          expanded={analysisExpanded}
+          ontoggle={toggleAnalysis}
+        ></c-codify-section-header>
+
+        <template lwc:if={analysisExpanded}>
+          <div id="codify-analysis" class="codify-collapse codify-grid">
+            <article class="codify-card codify-card_quiet">
+              <h3 class="codify-card__subtitle">What keeps breaking</h3>
+              <p class="codify-card__caption">Root causes, last 90 days.</p>
+              <div class="codify-card__body">
+                <c-codify-ranked-bars
+                  rows={rootCauseRows}
+                  tone="accent"
+                  loading={isLoading}
+                  empty-icon="utility:tag"
+                  empty-title="Nothing tagged yet"
+                  empty-message="Root causes appear here once a recap carries enough corroboration to classify."
+                ></c-codify-ranked-bars>
+              </div>
+            </article>
+
+            <article class="codify-card codify-card_quiet">
+              <h3 class="codify-card__subtitle">Who's capturing fixes</h3>
+              <p class="codify-card__caption">Recaps logged this week.</p>
+              <div class="codify-card__body">
+                <c-codify-ranked-bars
+                  rows={technicianRows}
+                  tone="ink"
+                  loading={isLoading}
+                  empty-icon="utility:user"
+                  empty-title="No recaps logged this week"
+                  empty-message="This fills in as technicians describe fixes after closing a Case."
+                ></c-codify-ranked-bars>
+              </div>
+            </article>
+
+            <article class="codify-card codify-card_quiet">
+              <h3 class="codify-card__subtitle">What Codify did</h3>
+              <p class="codify-card__caption">
+                Audited actions this week, by type.
+              </p>
+              <div class="codify-card__body">
+                <c-codify-ranked-bars
+                  rows={changeTypeRows}
+                  tone="pending"
+                  loading={isLoading}
+                  empty-icon="utility:record_lookup"
+                  empty-title="Nothing recorded this week"
+                  empty-message="Every write Codify makes produces one audit row, so this stays empty until it acts."
+                ></c-codify-ranked-bars>
+              </div>
+            </article>
+          </div>
+        </template>
+      </section>
+
+      <!-- ── Audit trail ────────────────────────────────────────────────── -->
+      <section class="codify-section">
+        <c-codify-section-header
+          eyebrow="Audit trail"
+          title="Latest audited actions"
+          description="Every write Codify makes produces exactly one row. These are the most recent."
+          icon-name="utility:record_lookup"
+          collapsible
+          expanded={activityExpanded}
+          ontoggle={toggleActivity}
+        >
+          <div slot="actions">
+            <lightning-button
+              variant="neutral"
+              label="Open the change log"
+              icon-name="utility:forward"
+              icon-position="right"
+              onclick={handleOpenChangeLog}
+            ></lightning-button>
+          </div>
+        </c-codify-section-header>
+
+        <template lwc:if={activityExpanded}>
+          <div id="codify-activity" class="codify-collapse">
+            <article class="codify-card codify-card_quiet">
+              <template lwc:if={activityError}>
+                <div class="codify-card__body">
+                  <c-codify-error-state
+                    title="The audit trail could not load"
+                    message={activityError.message}
+                    detail={activityError.detail}
+                    show-retry
+                    onretry={handleRetryActivity}
+                  ></c-codify-error-state>
+                </div>
+              </template>
+
+              <template lwc:elseif={isActivityLoading}>
+                <div class="codify-card__body">
+                  <c-codify-skeleton-loader
+                    variant="rows"
+                    count="5"
+                    height="2.5rem"
+                    assistive-text="Loading the audit trail"
+                  ></c-codify-skeleton-loader>
+                </div>
+              </template>
+
+              <template lwc:elseif={hasActivity}>
+                <ul class="codify-timeline">
+                  <template for:each={activity} for:item="item">
+                    <li key={item.id} class="codify-timeline__item">
+                      <span class="codify-timeline__marker" aria-hidden="true">
+                        <lightning-icon
+                          icon-name={item.icon}
+                          size="xx-small"
+                          class="codify-timeline__icon"
+                          alternative-text=""
+                        ></lightning-icon>
+                      </span>
+                      <div class="codify-timeline__body">
+                        <p class="codify-timeline__title">{item.title}</p>
+                        <p class="codify-timeline__meta">
+                          <span>{item.type}</span>
+                          <span aria-hidden="true">·</span>
+                          <span>{item.technician}</span>
+                          <span aria-hidden="true">·</span>
+                          <lightning-formatted-date-time
+                            value={item.createdDate}
+                            month="short"
+                            day="numeric"
+                            hour="2-digit"
+                            minute="2-digit"
+                          ></lightning-formatted-date-time>
+                        </p>
+                      </div>
+                      <div class="codify-timeline__aside">
+                        <template lwc:if={item.needsReview}>
+                          <c-codify-status-badge
+                            label="Needs review"
+                            tone="pending"
+                            compact
+                            assistive-prefix="Status:"
+                          ></c-codify-status-badge>
+                        </template>
+                        <template lwc:if={item.recordId}>
+                          <lightning-button-icon
+                            icon-name="utility:open"
+                            variant="bare"
+                            size="small"
+                            alternative-text="Open the changed record"
+                            title="Open the changed record"
+                            data-id={item.recordId}
+                            onclick={handleOpenRecord}
+                          ></lightning-button-icon>
+                        </template>
+                      </div>
+                    </li>
+                  </template>
+                </ul>
+              </template>
+
+              <template lwc:else>
+                <c-codify-empty-state
+                  icon-name="utility:record_lookup"
+                  title="Codify has not made any changes yet"
+                  message="Once a technician describes a fix, every write Codify makes shows up here with its before and after values."
+                  action-label="Open the change log"
+                  onaction={handleOpenChangeLog}
+                ></c-codify-empty-state>
+              </template>
+            </article>
+          </div>
+        </template>
+      </section>
     </template>
   </div>
 </template>

@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!--
+      Assigns Codify_Change_Log_Record_Page as the org default record page. See
+      the same block on Codify_Resolution_Log__c: the FlexiPage alone does
+      nothing until the View action is overridden.
+    -->
+    <actionOverrides>
+        <actionName>View</actionName>
+        <comment
+    >Org default Lightning record page for Codify Change Log.</comment>
+        <content>Codify_Change_Log_Record_Page</content>
+        <formFactor>Large</formFactor>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Flexipage</type>
+    </actionOverrides>
+    <compactLayoutAssignment>Codify_Change_Log_Compact</compactLayoutAssignment>
     <deploymentStatus>Deployed</deploymentStatus>
     <description
   >The audit backbone. One record per action Codify takes (Case field update, root cause tag, article draft created, related case flagged, escalation raised). Not optional: the goal is that nothing the agent does is invisible to service ops.</description>

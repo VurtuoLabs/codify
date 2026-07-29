@@ -1,0 +1,112 @@
+.codify-sh {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+  flex-wrap: wrap;
+}
+
+.codify-sh__main {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  min-width: 0;
+  flex: 1 1 16rem;
+}
+
+.codify-sh__copy {
+  min-width: 0;
+}
+
+/* Editorial eyebrow: small caps-ish label above the section title. */
+.codify-sh__eyebrow {
+  margin: 0 0 0.125rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--codify-accent, #0f766e);
+}
+
+.codify-sh__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--codify-ink, #1c1a17);
+}
+
+.codify-sh__icon {
+  --slds-c-icon-color-foreground: var(--codify-accent, #0f766e);
+  --slds-c-icon-color-foreground-default: var(--codify-accent, #0f766e);
+  flex: none;
+}
+
+.codify-sh__count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--codify-muted, #6f6a62);
+  font-variant-numeric: tabular-nums;
+}
+
+.codify-sh__description {
+  margin: 0.1875rem 0 0;
+  max-width: 62ch;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--codify-muted, #6f6a62);
+}
+
+/* Icon-only collapse control: its accessible name is supplied by assistive
+   text that names the section, so it never reads as a bare chevron. */
+.codify-sh__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-top: 0.0625rem;
+  padding: 0;
+  flex: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  cursor: pointer;
+  color: var(--codify-muted, #6f6a62);
+}
+
+.codify-sh__toggle:hover {
+  background: var(--codify-sunken, #f3f3f3);
+  border-color: var(--codify-line, #e5e5e5);
+}
+
+.codify-sh__toggle:focus-visible {
+  outline: 2px solid var(--codify-accent, #0f766e);
+  outline-offset: 1px;
+}
+
+.codify-sh__chevron {
+  --slds-c-icon-color-foreground: currentColor;
+  --slds-c-icon-color-foreground-default: currentColor;
+  transition: transform 160ms cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+.codify-sh__chevron_open {
+  transform: rotate(90deg);
+}
+
+.codify-sh__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .codify-sh__chevron {
+    transition: none;
+  }
+}

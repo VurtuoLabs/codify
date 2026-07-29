@@ -105,29 +105,42 @@ Plus custom fields on **Case** (resolution summary, root cause, suggested fix, r
 
 A Lightning app for service ops and Knowledge owners.
 
-| Tab                         | Backed by                  | Shows                                                                                                  |
-| --------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------ |
-| **Codify Home**             | `codifyHomeDashboard`      | Twelve uniform cards: the capture pipeline, the work waiting on a person, and what recurs.             |
-| **Change Log**              | `codifyChangeLogConsole`   | Every change, filterable by technician, Case, root cause, type and date, with before/after values.     |
-| **Resolution Logs**         | object tab                 | The raw recap history, linked forward to the Case and any article.                                     |
-| **Pending Article Reviews** | `codifyArticleReviewPanel` | Drafts side by side with the recap that produced them. Edit or reject; publishing stays in Knowledge.  |
-| **Root Cause Trends**       | `codifyRootCauseTrends`    | Which causes recur most, with a coverage column flagging recurring causes with no article behind them. |
+| Tab                         | Backed by                  | Shows                                                                                                    |
+| --------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **Codify Home**             | `codifyHomeDashboard`      | What is waiting on a person first, then the capture pipeline, cadence, what recurs, and the audit trail. |
+| **Change Log**              | `codifyChangeLogConsole`   | Every change, filterable by technician, Case, root cause, type and date, with before/after values.       |
+| **Resolution Logs**         | object tab                 | The raw recap history, linked forward to the Case and any article.                                       |
+| **Pending Article Reviews** | `codifyArticleReviewPanel` | Drafts side by side with the recap that produced them. Edit or reject; publishing stays in Knowledge.    |
+| **Root Cause Trends**       | `codifyRootCauseTrends`    | Which causes recur most, with a coverage column flagging recurring causes with no article behind them.   |
 
-`codifyCaseHistoryBadge` sits on the Case record page: "Codify logged this resolution and drafted a Knowledge article", expandable, with click-through to the source recap.
+`codifyCaseHistoryBadge` is built for the Case record page: "Codify logged this resolution and drafted a Knowledge article", expandable, with click-through to the source recap. This repo does **not** ship a Case FlexiPage, because deploying one would replace whatever Case page the org already uses; drop the component onto the existing Case page in the Lightning App Builder instead.
 
-**List views:** Knowledge "Codify Drafts Pending Review" · Cases "Resolved via Codify" · Resolution Logs "This Week" and "By Root Cause" · Change Logs "This Week", "Awaiting Human Review", "Field Updates Only".
+**Record pages:** both custom objects a user can click into ship an assigned record page, since a Lightning page that exists but is not assigned is invisible.
+
+| Object                     | Page                                | Reads as                                                                                                                                                                                                                                                    |
+| -------------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Codify_Resolution_Log__c` | `Codify_Resolution_Log_Record_Page` | Diagnosis first (root cause, confidence, whether it fell below the floor, the Case), then the verbatim recap beside the extracted summary, then provenance and the cached parse. Related: every change this recap produced; sidebar: the Cases it resolved. |
+| `Codify_Change_Log__c`     | `Codify_Change_Log_Record_Page`     | What changed, then old and new value side by side, with the source recap and technician in the sidebar. No related lists, because nothing looks up to an audit row.                                                                                         |
+
+Assignment is an `actionOverrides` block on each object (`actionName` `View`, `type` `Flexipage`), which is what makes the page the org default rather than a page sitting unused in Setup. Neither object has activities or feeds enabled, so neither page carries an activity or Chatter region.
+
+**Layouts:** related lists on a Lightning record page are drawn from the object's page layout, so each custom object ships its default layout (`<Object Label> Layout`, replaced in place so profile assignments survive) carrying the related list definitions and their columns.
+
+**Compact layouts:** both objects assign one, so lookup hovers, search results and mobile show the root cause or the change type rather than just an autonumber.
+
+**List views:** every object with a tab in this app ships an `All` view scoped to `Everything`, so no tab lands on a filtered subset - Cases, Knowledge, Resolution Logs and Change Logs. On top of that: Knowledge "Codify Drafts Pending Review" · Cases "Resolved via Codify" · Resolution Logs "This Week" and "By Root Cause" · Change Logs "This Week", "Awaiting Human Review", "Field Updates Only".
 
 ## Component inventory
 
-**Apex (17 classes)** — `Codify_Constants`, `Codify_Util`, `Codify_ResolutionParse` (DTO), `Codify_ExtractionService` (the only place a recap is interpreted), `Codify_ChangeLogService` (the audit backbone); five invocables; three LWC controllers; `Codify_TestUtil` and three test classes.
+**Apex (17 classes)** - `Codify_Constants`, `Codify_Util`, `Codify_ResolutionParse` (DTO), `Codify_ExtractionService` (the only place a recap is interpreted), `Codify_ChangeLogService` (the audit backbone); five invocables; three LWC controllers; `Codify_TestUtil` and three test classes.
 
-**Flows (5, autolaunched)** — `Codify_Log_Resolution`, `Codify_Tag_Root_Cause`, `Codify_Draft_Knowledge_Article`, `Codify_Related_Case_Sweep`, `Codify_Escalate_For_Review`. Each wraps one invocable and maps its outputs for the agent.
+**Flows (5, autolaunched)** - `Codify_Log_Resolution`, `Codify_Tag_Root_Cause`, `Codify_Draft_Knowledge_Article`, `Codify_Related_Case_Sweep`, `Codify_Escalate_For_Review`. Each wraps one invocable and maps its outputs for the agent.
 
-**LWCs (5)** — the four in the original brief plus `codifyRootCauseTrends`, which backs the Root Cause Trends tab.
+**LWCs (13 bundles)** - five surfaces: `codifyHomeDashboard`, `codifyChangeLogConsole`, `codifyArticleReviewPanel`, `codifyRootCauseTrends`, `codifyCaseHistoryBadge`. Plus seven internal components no surface duplicates - `codifyKpiCard`, `codifySectionHeader`, `codifyStatusBadge`, `codifySkeletonLoader`, `codifyEmptyState`, `codifyErrorState`, `codifyRankedBars` - and `codifyDisplay`, a JS-only module holding change-type presentation and the one place Apex errors are turned into plain language. The seven are `isExposed=false`: they are the app's design system, not page builder components.
 
-**Agent** — `Codify_Employee_Agent`, an `AiAuthoringBundle` of type `AgentforceEmployeeAgent`, with a router and six subagents. It runs as the logged-in user, so it needs no dedicated agent user.
+**Agent** - `Codify_Employee_Agent`, an `AiAuthoringBundle` of type `AgentforceEmployeeAgent`, with a router and six subagents. It runs as the logged-in user, so it needs no dedicated agent user.
 
-**Permission sets** — `Codify_Agent_User` (no delete on the audit objects, no Knowledge publish right) and `Codify_Reviewer` (service ops and Knowledge owners; read-only on the change log).
+**Permission sets** - `Codify_Agent_User` (no delete on the audit objects, no Knowledge publish right) and `Codify_Reviewer` (service ops and Knowledge owners; read-only on the change log).
 
 ## Guardrails
 
@@ -155,6 +168,7 @@ Deploy in dependency order, since `Codify_Resolution_Log__c` must exist before t
 ```bash
 sf project deploy start -d force-app/main/default/objects/Codify_Resolution_Log__c -o codify-org
 sf project deploy start -d force-app/main/default/objects -d force-app/main/default/customMetadata -o codify-org
+sf project deploy start -d force-app/main/default/layouts -o codify-org
 sf project deploy start -d force-app/main/default/classes -o codify-org
 sf project deploy start -d force-app/main/default/flows -d force-app/main/default/lwc -o codify-org
 sf project deploy start -d force-app/main/default/flexipages -o codify-org
@@ -162,6 +176,12 @@ sf project deploy start -d force-app/main/default/tabs -d force-app/main/default
 sf project deploy start -d force-app/main/default/permissionsets -o codify-org
 sf project deploy start -d force-app/main/default/aiAuthoringBundles -o codify-org
 ```
+
+> **One circular reference the staged order cannot express.** Each custom object's record page is assigned through an `actionOverrides` block in its own `*.object-meta.xml`, whose `content` names a FlexiPage - while that FlexiPage names the object's fields and related lists. Neither half validates without the other, so the two must land in the **same** deploy. Deploy the whole package at once instead of the two `objects` steps above if you are starting from an empty org:
+>
+> ```bash
+> sf project deploy start -d force-app -o codify-org
+> ```
 
 Then assign access, publish and activate the agent:
 
@@ -175,9 +195,9 @@ Nothing here needs an org-specific value filled in first.
 
 ## Configuration reference
 
-**Tuning the taxonomy** — add or edit rows in `force-app/main/default/customMetadata/`. `Detection_Keywords__c` drives classification, `Article_Worthy__c` decides whether that kind of fix is normally worth writing up, `Related_Keys__c` widens the sweep. No Apex change needed.
+**Tuning the taxonomy** - add or edit rows in `force-app/main/default/customMetadata/`. `Detection_Keywords__c` drives classification, `Article_Worthy__c` decides whether that kind of fix is normally worth writing up, `Related_Keys__c` widens the sweep. No Apex change needed.
 
-**Tuning thresholds** — `Codify_Constants`:
+**Tuning thresholds** - `Codify_Constants`:
 
 | Constant                      | Default | Effect                                                             |
 | ----------------------------- | ------- | ------------------------------------------------------------------ |
@@ -207,7 +227,11 @@ npm run prettier:verify
 npm run lint
 ```
 
-The suite covers the guardrails hardest: that an uncorroborated keyword does **not** tag, that the sweep refuses to run from a low-confidence diagnosis, that a forced draft still lands in `Draft`, that a second draft run does not duplicate, and that rejecting a draft keeps the resolution.
+The Apex suite covers the guardrails hardest: that an uncorroborated keyword does **not** tag, that the sweep refuses to run from a low-confidence diagnosis, that a forced draft still lands in `Draft`, that a second draft run does not duplicate, and that rejecting a draft keeps the resolution.
+
+The Jest suite (109 tests across 13 bundles) covers the UI contracts that are easy to break by accident: that every surface shows a skeleton rather than a blank card while loading, that empty and error states are distinguishable from each other and from "nothing has happened yet", that state is never signalled by colour without a label, that rejecting a draft asks first, and that the review panel never grows a publish button.
+
+> `npm run lint` uses the Salesforce template's `**/{aura,lwc}/**/*.js` glob and fails on this repo because there is no `aura` directory - a pre-existing quirk of the script, not of the code. `npx eslint force-app --ext js` runs clean.
 
 ## Project structure
 
@@ -219,7 +243,8 @@ codify/
 │   ├── classes/                             # 17 Apex classes
 │   ├── customMetadata/                      # 14 root cause taxonomy rows
 │   ├── flows/                               # 5 autolaunched flows
-│   ├── lwc/                                 # 5 components
+│   ├── layouts/                             # 2 default layouts, for the related lists
+│   ├── lwc/                                 # 5 surfaces + 8 shared bundles
 │   ├── objects/                             # 2 custom objects, 1 CMT, Case + Knowledge fields
 │   └── permissionsets/
 └── scripts/apex/                            # seed and reset

@@ -1,24 +1,542 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Pending Article Reviews - the review desk itself.
+
+   This is where the app's identity is load-bearing rather than decorative. Three
+   surfaces, each styled as what it is:
+
+     · the QUEUE - a slim index down the left, sans-serif, dense
+     · the PAPER - the draft, set as a manuscript: serif, ~68ch measure,
+                     generous leading, no field boxes
+     · the SOURCE - the technician's verbatim recap on sunken stock, quoted,
+                     with its line breaks preserved
+
+   The reviewer's controls never sit on the paper. They live in a footer with its
+   own tint and a rule above it, so "the draft" and "what I can do to the draft"
+   are never the same visual object. Editing swaps the paper for an obviously
+   different editing surface, which is also what stops the compare-to-the-recap
+   step from being skipped by reflex.
+
+   Tokens are declared here per component because LWC CSS is scoped; see
+   codifyHomeDashboard.css for the reasoning.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 :host {
+  --codify-paper: #ffffff;
+  --codify-surface: #ffffff;
+  --codify-sunken: #f3f3f3;
+  --codify-ink: #1c1a17;
+  --codify-ink-soft: #46423c;
+  --codify-muted: #6f6a62;
+  --codify-line: #e5e5e5;
+  --codify-line-strong: #c9c9c9;
+
+  --codify-accent: #0f766e;
+  --codify-accent-strong: #115e59;
+  --codify-accent-ink: #134e4a;
+  --codify-accent-soft: #5eada6;
+  --codify-accent-tint: #e6f4f1;
+  --codify-good: #047857;
+  --codify-good-tint: #e7f3ec;
+
+  --codify-pending: #4b5563;
+  --codify-pending-tint: #eeeeec;
+  --codify-critical: #b42318;
+  --codify-critical-tint: #fbeceb;
+
+  --codify-shadow: 0 1px 2px rgba(28, 26, 23, 0.06);
+  --codify-serif:
+    "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
+    "Times New Roman", serif;
+
   display: block;
+  background: var(--codify-paper);
 }
 
-.codify-queue-item {
-  padding: var(--slds-g-spacing-2, 0.5rem);
+.codify-desk {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-4, 1rem);
+  padding: var(--slds-g-spacing-5, 1.5rem) var(--slds-g-spacing-4, 1rem)
+    var(--slds-g-spacing-6, 2rem);
+  color: var(--codify-ink);
+}
+
+/* ── Masthead ─────────────────────────────────────────────────────────────── */
+.codify-masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--slds-g-spacing-4, 1rem);
+  padding-bottom: var(--slds-g-spacing-3, 0.75rem);
+  border-bottom: 2px solid var(--codify-ink);
+}
+
+/* Lets the masthead copy shrink before the actions wrap, rather than pushing
+   the page into horizontal overflow on a narrow viewport. */
+.codify-masthead__copy {
+  flex: 1 1 20rem;
+  min-width: 0;
+}
+
+.codify-masthead__eyebrow {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--codify-accent);
+}
+
+.codify-masthead__title {
+  margin: 0.125rem 0 0;
+  font-family: var(--codify-serif);
+  font-size: 2rem;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.codify-masthead__lede {
+  margin: 0.375rem 0 0;
+  max-width: 62ch;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--codify-muted);
+}
+
+.codify-masthead__aside {
+  display: flex;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.codify-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.codify-action__spinner {
+  position: relative;
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* ── Lifecycle ────────────────────────────────────────────────────────────── */
+.codify-lifecycle {
+  padding: var(--slds-g-spacing-4, 1rem);
+  background: var(--codify-surface);
+  border: 1px solid var(--codify-line);
   border-radius: var(--slds-g-radius-border-2, 0.25rem);
+}
+
+.codify-lifecycle__note {
+  margin: var(--slds-g-spacing-3, 0.75rem) 0 0;
+  max-width: 76ch;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--codify-muted);
+}
+
+/* ── Three-surface layout ─────────────────────────────────────────────────── */
+.codify-review {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--slds-g-spacing-4, 1rem);
+  align-items: start;
+}
+
+@media (min-width: 48em) {
+  .codify-review {
+    grid-template-columns: minmax(13rem, 1fr) minmax(0, 2fr);
+  }
+  /* The recap drops under the manuscript on laptops rather than squeezing the
+     measure below what is comfortable to read. */
+  .codify-card_source {
+    grid-column: 2;
+  }
+}
+
+@media (min-width: 80em) {
+  .codify-review {
+    grid-template-columns: minmax(13rem, 0.9fr) minmax(0, 2.4fr) minmax(
+        14rem,
+        1.1fr
+      );
+  }
+  .codify-card_source {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+.codify-card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--slds-g-spacing-4, 1rem);
+  background: var(--codify-surface);
+  border: 1px solid var(--codify-line);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  box-shadow: var(--codify-shadow);
+}
+
+.codify-card_paper {
+  padding: 0;
+  overflow: hidden;
+}
+
+.codify-card_source {
+  background: var(--codify-sunken);
+  box-shadow: none;
+}
+
+/* ── The queue ────────────────────────────────────────────────────────────── */
+.codify-queue {
+  margin: var(--slds-g-spacing-3, 0.75rem) 0 0;
+  padding: 0;
+  list-style: none;
+  max-height: 34rem;
+  overflow-y: auto;
+}
+
+.codify-queue__item {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  width: 100%;
+  padding: var(--slds-g-spacing-2, 0.5rem);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-left: 0.1875rem solid transparent;
+  border-radius: 0;
   cursor: pointer;
+  transition:
+    background-color 140ms cubic-bezier(0.3, 0, 0.2, 1),
+    border-color 140ms cubic-bezier(0.3, 0, 0.2, 1);
 }
 
-.codify-queue-item:hover {
-  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+.codify-queue__item:hover {
+  background: var(--codify-sunken);
 }
 
-.codify-queue-item_selected {
-  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
-  border-left: 3px solid var(--slds-g-color-accent-container-1, #0176d3);
+.codify-queue__item:focus-visible {
+  outline: 2px solid var(--codify-accent);
+  outline-offset: -2px;
 }
 
-/* The recap is dictated speech: preserve the technician's line breaks so a
-   reviewer reads it as written rather than as one reflowed block. */
+.codify-queue__item_selected {
+  background: var(--codify-accent-tint);
+  border-left-color: var(--codify-accent);
+}
+
+.codify-queue__index {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--codify-line-strong);
+  padding-top: 0.125rem;
+}
+
+.codify-queue__item_selected .codify-queue__index {
+  color: var(--codify-accent);
+}
+
+.codify-queue__text {
+  min-width: 0;
+}
+
+.codify-queue__title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--codify-ink);
+}
+
+.codify-queue__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  color: var(--codify-muted);
+}
+
+/* ── The paper ────────────────────────────────────────────────────────────── */
+.codify-ms {
+  padding: var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-5, 1.5rem)
+    var(--slds-g-spacing-5, 1.5rem);
+}
+
+.codify-ms__stamp {
+  margin: 0 0 var(--slds-g-spacing-3, 0.75rem);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--codify-muted);
+}
+
+.codify-ms__paper {
+  max-width: 68ch;
+  animation: codify-fade-in 200ms cubic-bezier(0.3, 0, 0.2, 1) both;
+}
+
+@keyframes codify-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.codify-ms__kicker {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--codify-accent);
+}
+
+.codify-ms__title {
+  margin: 0.375rem 0 0;
+  font-family: var(--codify-serif);
+  font-size: 1.75rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--codify-ink);
+}
+
+/* The summary is the lede: same serif, larger and lighter than the body. */
+.codify-ms__lede {
+  margin: var(--slds-g-spacing-3, 0.75rem) 0 0;
+  padding-bottom: var(--slds-g-spacing-3, 0.75rem);
+  border-bottom: 1px solid var(--codify-line);
+  font-family: var(--codify-serif);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--codify-ink-soft);
+}
+
+.codify-ms__body {
+  margin-top: var(--slds-g-spacing-4, 1rem);
+  font-family: var(--codify-serif);
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--codify-ink);
+}
+
+/* ── The editing surface ──────────────────────────────────────────────────── */
+.codify-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+  max-width: 52rem;
+  padding: var(--slds-g-spacing-4, 1rem);
+  background: var(--codify-sunken);
+  border: 1px dashed var(--codify-line-strong);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+}
+
+.codify-editor__kicker {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--codify-pending);
+}
+
+.codify-editor__hint {
+  margin: -0.375rem 0 0;
+  font-size: 0.6875rem;
+  color: var(--codify-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.codify-editor__error {
+  margin: -0.375rem 0 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--codify-critical);
+}
+
+/* ── The reviewer's controls ──────────────────────────────────────────────── */
+.codify-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+  margin-top: auto;
+  padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-5, 1.5rem);
+  background: var(--codify-sunken);
+  border-top: 1px solid var(--codify-line);
+}
+
+.codify-controls__state {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.codify-controls__saved {
+  margin: 0;
+  max-width: 40ch;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--codify-good);
+}
+
+.codify-controls__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+/* Destructive action, held apart from Save by a rule rather than by proximity. */
+.codify-controls__danger {
+  padding-left: var(--slds-g-spacing-3, 0.75rem);
+  border-left: 1px solid var(--codify-line-strong);
+}
+
+/* ── The source recap ─────────────────────────────────────────────────────── */
 .codify-recap {
+  margin: var(--slds-g-spacing-3, 0.75rem) 0 0;
+  padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
+  background: var(--codify-surface);
+  border-left: 0.1875rem solid var(--codify-accent-soft);
+  border-radius: 0 var(--slds-g-radius-border-2, 0.25rem)
+    var(--slds-g-radius-border-2, 0.25rem) 0;
+  font-family: var(--codify-serif);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--codify-ink);
+  /* Dictated speech: keep the technician's own line breaks. */
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 24rem;
+  overflow-y: auto;
+}
+
+.codify-source__none {
+  margin: var(--slds-g-spacing-3, 0.75rem) 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--codify-critical);
+}
+
+.codify-source__meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  margin: var(--slds-g-spacing-4, 1rem) 0 0;
+}
+
+.codify-source__pair dt {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--codify-muted);
+}
+
+.codify-source__pair dd {
+  margin: 0.0625rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--codify-ink);
+}
+
+.codify-source__links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  margin-top: var(--slds-g-spacing-3, 0.75rem);
+  padding-top: var(--slds-g-spacing-3, 0.75rem);
+  border-top: 1px solid var(--codify-line);
+}
+
+/* ── Reject dialog ────────────────────────────────────────────────────────── */
+.codify-dialog__header {
+  border-bottom: 1px solid var(--codify-line);
+}
+
+.codify-dialog__title {
+  margin: 0;
+  font-family: var(--codify-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--codify-ink);
+}
+
+.codify-dialog__body {
+  padding: var(--slds-g-spacing-4, 1rem);
+  text-align: left;
+}
+
+.codify-dialog__copy {
+  margin: 0 0 var(--slds-g-spacing-3, 0.75rem);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--codify-ink-soft);
+}
+
+.codify-dialog__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  border-top: 1px solid var(--codify-line);
+}
+
+@media (max-width: 47.9375em) {
+  .codify-masthead__title {
+    font-size: 1.625rem;
+  }
+
+  .codify-ms {
+    padding: var(--slds-g-spacing-4, 1rem);
+  }
+
+  .codify-ms__title {
+    font-size: 1.5rem;
+  }
+
+  .codify-controls {
+    padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
+    align-items: stretch;
+  }
+
+  /* On a phone the destructive action moves onto its own row above a rule
+     instead of sitting next to Save. */
+  .codify-controls__danger {
+    width: 100%;
+    padding-left: 0;
+    padding-top: var(--slds-g-spacing-2, 0.5rem);
+    border-left: 0;
+    border-top: 1px solid var(--codify-line-strong);
+  }
+
+  .codify-queue {
+    max-height: 18rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .codify-ms__paper,
+  .codify-queue__item {
+    animation: none;
+    transition: none;
+  }
 }

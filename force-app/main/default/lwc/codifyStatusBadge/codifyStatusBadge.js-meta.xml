@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <isExposed>false</isExposed>
+    <masterLabel>Codify Status Badge</masterLabel>
+    <description
+  >Shared status pill for the Codify app. Pairs every tone with an icon and a label so state is never communicated by colour alone.</description>
+</LightningComponentBundle>

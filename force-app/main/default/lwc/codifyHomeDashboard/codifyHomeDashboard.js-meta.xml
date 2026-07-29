@@ -4,7 +4,7 @@
     <isExposed>true</isExposed>
     <masterLabel>Codify Home Dashboard</masterLabel>
     <description
-  >Summary tiles and a 7-day trend: resolutions logged, articles drafted versus awaiting review, related Cases flagged, and recaps escalated to a human rather than guessed.</description>
+  >The Codify review desk: what is waiting on a person first (drafts to review, recaps left unclassified, escalations), then the capture pipeline, seven-day cadence, what keeps breaking, and the latest audited actions.</description>
     <targets>
         <target>lightning__AppPage</target>
         <target>lightning__HomePage</target>

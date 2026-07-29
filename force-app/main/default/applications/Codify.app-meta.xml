@@ -6,8 +6,9 @@
     <navType>Standard</navType>
     <uiType>Lightning</uiType>
     <formFactors>Large</formFactors>
+    <formFactors>Small</formFactors>
     <brand>
-        <headerColor>#032D60</headerColor>
+        <headerColor>#134E4A</headerColor>
         <shouldOverrideOrgTheme>true</shouldOverrideOrgTheme>
     </brand>
     <tabs>Codify_Home</tabs>

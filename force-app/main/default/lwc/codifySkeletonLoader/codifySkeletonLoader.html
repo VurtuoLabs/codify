@@ -1,0 +1,46 @@
+<template>
+  <div class="codify-skeleton" role="status" aria-live="polite">
+    <span class="slds-assistive-text">{assistiveText}</span>
+
+    <template lwc:if={isKpi}>
+      <div class="codify-skeleton__kpi" aria-hidden="true">
+        <span class="codify-shimmer codify-skeleton__eyebrow"></span>
+        <span class="codify-shimmer codify-skeleton__value"></span>
+        <span class="codify-shimmer codify-skeleton__bar"></span>
+        <span class="codify-shimmer codify-skeleton__meta"></span>
+      </div>
+    </template>
+
+    <template lwc:elseif={isRows}>
+      <div class="codify-skeleton__rows" aria-hidden="true">
+        <template for:each={items} for:item="row">
+          <span
+            key={row.key}
+            class="codify-shimmer codify-skeleton__row"
+            style={row.style}
+          ></span>
+        </template>
+      </div>
+    </template>
+
+    <template lwc:elseif={isBlock}>
+      <span
+        class="codify-shimmer codify-skeleton__block"
+        style={blockStyle}
+        aria-hidden="true"
+      ></span>
+    </template>
+
+    <template lwc:else>
+      <div class="codify-skeleton__lines" aria-hidden="true">
+        <template for:each={items} for:item="line">
+          <span
+            key={line.key}
+            class="codify-shimmer codify-skeleton__line"
+            style={line.style}
+          ></span>
+        </template>
+      </div>
+    </template>
+  </div>
+</template>

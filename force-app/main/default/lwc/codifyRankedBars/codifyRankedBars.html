@@ -1,0 +1,40 @@
+<template>
+  <div class="codify-ranked">
+    <template lwc:if={loading}>
+      <c-codify-skeleton-loader
+        variant="rows"
+        count={skeletonCount}
+        height="1.25rem"
+        assistive-text="Loading ranked list"
+      ></c-codify-skeleton-loader>
+    </template>
+
+    <template lwc:elseif={hasRows}>
+      <ul class="codify-ranked__list">
+        <template for:each={displayRows} for:item="row">
+          <li key={row.label} class="codify-ranked__row">
+            <span class="codify-ranked__label" title={row.label}
+              >{row.label}</span
+            >
+            <span class="codify-ranked__track" aria-hidden="true">
+              <span class={barClass} style={row.style}></span>
+            </span>
+            <span class="codify-ranked__value">{row.display}</span>
+          </li>
+        </template>
+      </ul>
+
+      <template lwc:if={hiddenCount}>
+        <p class="codify-ranked__more">{hiddenLabel}</p>
+      </template>
+    </template>
+
+    <template lwc:else>
+      <c-codify-empty-state
+        icon-name={emptyIcon}
+        title={emptyTitle}
+        message={emptyMessage}
+      ></c-codify-empty-state>
+    </template>
+  </div>
+</template>

@@ -1,53 +1,138 @@
 <template>
-  <template if:true={hasChanges}>
-    <div class="slds-box slds-box_x-small slds-theme_shade">
-      <div
-        class="slds-grid slds-grid_vertical-align-center slds-grid_align-spread"
-      >
-        <div class="slds-grid slds-grid_vertical-align-center">
+  <!-- Loading placeholder is the height of the collapsed strip, so the usual
+       outcome resolves without shifting the Case page. -->
+  <template lwc:if={isLoading}>
+    <div class="codify-note codify-note_loading">
+      <c-codify-skeleton-loader
+        variant="block"
+        height="1.5rem"
+        assistive-text="Checking what Codify did on this Case"
+      ></c-codify-skeleton-loader>
+    </div>
+  </template>
+
+  <template lwc:elseif={error}>
+    <c-codify-error-state
+      title="Codify's history is unavailable"
+      message={error.message}
+      detail={error.detail}
+    ></c-codify-error-state>
+  </template>
+
+  <template lwc:elseif={hasChanges}>
+    <div class="codify-note">
+      <div class="codify-note__head">
+        <span class="codify-note__mark" aria-hidden="true">
           <lightning-icon
-            icon-name="custom:custom18"
+            icon-name="utility:knowledge_base"
             size="x-small"
-            class="slds-m-right_x-small"
+            class="codify-note__icon"
+            alternative-text=""
           ></lightning-icon>
-          <span class="slds-text-body_regular">{badgeLabel}</span>
+        </span>
+
+        <div class="codify-note__copy">
+          <p class="codify-note__headline">{badgeLabel}</p>
+          <div class="codify-note__badges">
+            <template for:each={statusBadges} for:item="badge">
+              <c-codify-status-badge
+                key={badge.key}
+                label={badge.label}
+                tone={badge.tone}
+                icon-name={badge.icon}
+                assistive-prefix="Status:"
+                compact
+              ></c-codify-status-badge>
+            </template>
+          </div>
         </div>
+
         <lightning-button
           variant="base"
           label={toggleLabel}
+          aria-expanded={expandedString}
+          aria-controls="codify-case-detail"
           onclick={toggle}
         ></lightning-button>
       </div>
 
-      <template if:true={expanded}>
-        <ul class="slds-has-dividers_bottom-space slds-p-top_x-small">
-          <template for:each={rows} for:item="row">
-            <li key={row.id} class="slds-item">
-              <div class="slds-text-body_small">{row.title}</div>
-              <div class="slds-grid slds-grid_align-spread">
-                <span class="slds-text-body_small slds-text-color_weak"
-                  >{row.meta}</span
-                >
-                <div>
-                  <template if:true={row.needsReview}>
-                    <span
-                      class="slds-badge slds-badge_inverse slds-m-right_x-small"
-                      >Awaiting review</span
-                    >
-                  </template>
-                  <template if:true={row.recapId}>
-                    <a
-                      data-id={row.recapId}
-                      onclick={openRecap}
-                      class="slds-text-body_small"
-                      >View source recap</a
-                    >
-                  </template>
-                </div>
-              </div>
-            </li>
+      <template lwc:if={expanded}>
+        <div id="codify-case-detail" class="codify-note__detail">
+          <template lwc:if={isRowsLoading}>
+            <c-codify-skeleton-loader
+              variant="rows"
+              count="3"
+              height="2.25rem"
+              assistive-text="Loading the changes Codify made"
+            ></c-codify-skeleton-loader>
           </template>
-        </ul>
+
+          <template lwc:else>
+            <ul class="codify-thread">
+              <template for:each={rows} for:item="row">
+                <li key={row.id} class="codify-thread__item">
+                  <span class="codify-thread__marker" aria-hidden="true">
+                    <lightning-icon
+                      icon-name={row.icon}
+                      size="xx-small"
+                      class="codify-thread__icon"
+                      alternative-text=""
+                    ></lightning-icon>
+                  </span>
+
+                  <div class="codify-thread__body">
+                    <p class="codify-thread__title">{row.title}</p>
+                    <template lwc:if={row.hasDiff}>
+                      <p class="codify-thread__diff">
+                        <span class="codify-thread__old">{row.oldValue}</span>
+                        <lightning-icon
+                          icon-name="utility:forward"
+                          size="xx-small"
+                          class="codify-thread__arrow"
+                          alternative-text="changed to"
+                        ></lightning-icon>
+                        <span class="codify-thread__new">{row.newValue}</span>
+                      </p>
+                    </template>
+                    <p class="codify-thread__meta">
+                      <span>{row.type}</span>
+                      <span aria-hidden="true">·</span>
+                      <span>{row.who}</span>
+                      <span aria-hidden="true">·</span>
+                      <lightning-formatted-date-time
+                        value={row.createdDate}
+                        month="short"
+                        day="numeric"
+                        hour="2-digit"
+                        minute="2-digit"
+                      ></lightning-formatted-date-time>
+                    </p>
+                  </div>
+
+                  <div class="codify-thread__aside">
+                    <template lwc:if={row.needsReview}>
+                      <c-codify-status-badge
+                        label="Awaiting review"
+                        tone="pending"
+                        compact
+                        assistive-prefix="Status:"
+                      ></c-codify-status-badge>
+                    </template>
+                    <template lwc:if={row.recapId}>
+                      <lightning-button
+                        variant="base"
+                        label="Source recap"
+                        icon-name="utility:open"
+                        data-id={row.recapId}
+                        onclick={openRecap}
+                      ></lightning-button>
+                    </template>
+                  </div>
+                </li>
+              </template>
+            </ul>
+          </template>
+        </div>
       </template>
     </div>
   </template>
