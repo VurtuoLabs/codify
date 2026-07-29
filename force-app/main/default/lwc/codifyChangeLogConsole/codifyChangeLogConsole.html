@@ -1,108 +1,578 @@
 <template>
-  <lightning-card title="Codify Change Log" icon-name="custom:custom18">
-    <span slot="actions" class="slds-text-body_small slds-text-color_weak"
-      >{rowCountLabel}</span
-    >
+  <div class="codify-desk">
+    <header class="codify-masthead">
+      <div class="codify-masthead__copy">
+        <p class="codify-masthead__eyebrow">Codify</p>
+        <h1 class="codify-masthead__title">Change log</h1>
+        <p class="codify-masthead__lede">
+          Every write Codify has made, with its before and after values and a
+          route back to the recap that caused it. Nothing it does is unrecorded.
+        </p>
+      </div>
+      <div class="codify-masthead__aside">
+        <p class="codify-masthead__stamp" aria-live="polite">{rowCountLabel}</p>
+        <div class="codify-action">
+          <lightning-button
+            label="Refresh"
+            icon-name="utility:refresh"
+            variant="neutral"
+            disabled={isLoading}
+            onclick={handleRefresh}
+          ></lightning-button>
+          <template lwc:if={isLoading}>
+            <span class="codify-action__spinner">
+              <lightning-spinner
+                size="x-small"
+                variant="brand"
+                alternative-text="Loading changes"
+              ></lightning-spinner>
+            </span>
+          </template>
+        </div>
+      </div>
+    </header>
 
-    <div class="slds-p-horizontal_medium slds-p-bottom_small">
-      <div
-        class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end"
+    <section class="codify-card">
+      <c-codify-section-header
+        eyebrow="Audit trail"
+        title="Filter the record"
+        description="The first six filters are applied by Salesforce; the search box narrows what has already been fetched."
+        icon-name="utility:filterList"
+        count={filterCountLabel}
       >
-        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
-          <lightning-combobox
-            label="Technician"
-            value={technicianFilter}
-            options={technicianOptions}
-            onchange={handleTechnician}
-          ></lightning-combobox>
+        <div slot="actions">
+          <lightning-button
+            variant="base"
+            label={filtersToggleLabel}
+            aria-expanded={filtersExpandedString}
+            aria-controls="codify-filters"
+            onclick={toggleFilters}
+          ></lightning-button>
         </div>
-        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
-          <lightning-input
-            type="text"
-            label="Case Id"
-            value={caseFilter}
-            placeholder="500..."
-            onchange={handleCase}
-            oncommit={handleCaseCommit}
-          ></lightning-input>
-        </div>
-        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
-          <lightning-combobox
-            label="Root cause"
-            value={rootCauseFilter}
-            options={rootCauseOptions}
-            onchange={handleRootCause}
-          ></lightning-combobox>
-        </div>
-        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
-          <lightning-combobox
-            label="Change type"
-            value={typeFilter}
-            options={typeOptions}
-            onchange={handleType}
-          ></lightning-combobox>
-        </div>
-        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
-          <lightning-input
-            type="date"
-            label="From"
-            value={startDate}
-            onchange={handleStart}
-          ></lightning-input>
-        </div>
-        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
-          <lightning-input
-            type="date"
-            label="To"
-            value={endDate}
-            onchange={handleEnd}
-          ></lightning-input>
-        </div>
-      </div>
-      <div class="slds-p-top_x-small">
-        <lightning-button
-          label="Reset filters"
-          onclick={handleReset}
-          variant="neutral"
-        ></lightning-button>
-      </div>
-    </div>
+      </c-codify-section-header>
 
-    <template if:true={isLoading}>
-      <lightning-spinner
-        alternative-text="Loading"
-        size="small"
-      ></lightning-spinner>
-    </template>
+      <template lwc:if={filtersExpanded}>
+        <div id="codify-filters" class="codify-collapse codify-filterbar">
+          <div class="codify-filterbar__grid">
+            <lightning-input
+              type="search"
+              label="Search fetched changes"
+              placeholder="Record, field, value or technician…"
+              value={searchTerm}
+              onchange={handleSearch}
+            ></lightning-input>
 
-    <template if:true={error}>
-      <div class="slds-p-horizontal_medium slds-text-color_error" role="alert">
-        {error}
-      </div>
-    </template>
+            <lightning-combobox
+              label="Technician"
+              value={technicianFilter}
+              options={technicianOptions}
+              onchange={handleTechnician}
+            ></lightning-combobox>
 
-    <template if:true={hasRows}>
-      <div class="slds-p-horizontal_x-small codify-table">
-        <lightning-datatable
-          key-field="id"
-          data={rows}
-          columns={columns}
-          hide-checkbox-column
-          onrowaction={handleRowAction}
-          column-widths-mode="auto"
-        >
-        </lightning-datatable>
-      </div>
-    </template>
+            <lightning-combobox
+              label="Change type"
+              value={typeFilter}
+              options={typeOptions}
+              onchange={handleType}
+            ></lightning-combobox>
 
-    <template if:false={hasRows}>
-      <template if:false={isLoading}>
-        <div
-          class="slds-p-around_large slds-align_absolute-center slds-text-color_weak"
-        >
-          No changes match these filters yet.
+            <lightning-combobox
+              label="Root cause"
+              value={rootCauseFilter}
+              options={rootCauseOptions}
+              onchange={handleRootCause}
+            ></lightning-combobox>
+
+            <lightning-input
+              type="text"
+              label="Case Id"
+              value={caseFilter}
+              placeholder="500…"
+              field-level-help="Paste a Case record id to see only the changes Codify made to that Case."
+              onchange={handleCase}
+              oncommit={handleCaseCommit}
+            ></lightning-input>
+
+            <lightning-input
+              type="date"
+              label="Changed on or after"
+              value={startDate}
+              onchange={handleStart}
+            ></lightning-input>
+
+            <lightning-input
+              type="date"
+              label="Changed on or before"
+              value={endDate}
+              onchange={handleEnd}
+            ></lightning-input>
+          </div>
+
+          <div class="codify-filterbar__foot">
+            <lightning-button
+              variant="neutral"
+              label="Reset filters"
+              icon-name="utility:undo"
+              disabled={isLoading}
+              onclick={handleReset}
+            ></lightning-button>
+            <template lwc:if={optionsError}>
+              <p class="codify-filterbar__warning" role="status">
+                {optionsError.message} The filters below fall back to “all”.
+              </p>
+            </template>
+          </div>
         </div>
       </template>
-    </template>
-  </lightning-card>
+    </section>
+
+    <section class="codify-card">
+      <c-codify-section-header
+        eyebrow="Changes"
+        title="What Codify wrote"
+        description="Newest first. Open a row to read values too long to sit in a cell."
+        icon-name="utility:record_lookup"
+        count={rangeLabel}
+      ></c-codify-section-header>
+
+      <div class="codify-card__body">
+        <template lwc:if={error}>
+          <c-codify-error-state
+            title="The change log could not load"
+            message={error.message}
+            detail={error.detail}
+            show-retry
+            retrying={isLoading}
+            onretry={handleRetry}
+          ></c-codify-error-state>
+        </template>
+
+        <template lwc:elseif={isLoading}>
+          <!-- Skeleton rows are the height of real rows, so the table does not
+               jump when the query returns. -->
+          <div class="codify-skeleton-table">
+            <c-codify-skeleton-loader
+              variant="rows"
+              count="8"
+              height="2.75rem"
+              assistive-text="Loading changes"
+            ></c-codify-skeleton-loader>
+          </div>
+        </template>
+
+        <template lwc:elseif={hasRows}>
+          <div class="codify-tablewrap codify-collapse">
+            <table class="codify-table">
+              <caption class="slds-assistive-text">
+                Changes Codify has made, newest first. Use the column headers to
+                sort.
+              </caption>
+              <thead>
+                <tr>
+                  <th class="codify-th-cell codify-th-cell_toggle" scope="col">
+                    <span class="slds-assistive-text">Row details</span>
+                  </th>
+                  <th
+                    class="codify-th-cell"
+                    scope="col"
+                    aria-sort={sortMeta.name.ariaSort}
+                  >
+                    <button
+                      class={sortMeta.name.buttonClass}
+                      type="button"
+                      data-field="name"
+                      onclick={handleSort}
+                    >
+                      <span>Change #</span>
+                      <lightning-icon
+                        icon-name={sortMeta.name.icon}
+                        size="xx-small"
+                        class="codify-th__arrow"
+                        alternative-text=""
+                      ></lightning-icon>
+                      <span class="slds-assistive-text"
+                        >{sortMeta.name.assistiveText}</span
+                      >
+                    </button>
+                  </th>
+                  <th
+                    class="codify-th-cell"
+                    scope="col"
+                    aria-sort={sortMeta.changeType.ariaSort}
+                  >
+                    <button
+                      class={sortMeta.changeType.buttonClass}
+                      type="button"
+                      data-field="changeType"
+                      onclick={handleSort}
+                    >
+                      <span>Type</span>
+                      <lightning-icon
+                        icon-name={sortMeta.changeType.icon}
+                        size="xx-small"
+                        class="codify-th__arrow"
+                        alternative-text=""
+                      ></lightning-icon>
+                      <span class="slds-assistive-text"
+                        >{sortMeta.changeType.assistiveText}</span
+                      >
+                    </button>
+                  </th>
+                  <th
+                    class="codify-th-cell"
+                    scope="col"
+                    aria-sort={sortMeta.relatedRecordName.ariaSort}
+                  >
+                    <button
+                      class={sortMeta.relatedRecordName.buttonClass}
+                      type="button"
+                      data-field="relatedRecordName"
+                      onclick={handleSort}
+                    >
+                      <span>Record</span>
+                      <lightning-icon
+                        icon-name={sortMeta.relatedRecordName.icon}
+                        size="xx-small"
+                        class="codify-th__arrow"
+                        alternative-text=""
+                      ></lightning-icon>
+                      <span class="slds-assistive-text"
+                        >{sortMeta.relatedRecordName.assistiveText}</span
+                      >
+                    </button>
+                  </th>
+                  <th class="codify-th-cell" scope="col">
+                    <span class="codify-th codify-th_static">Root cause</span>
+                  </th>
+                  <th class="codify-th-cell" scope="col">
+                    <span class="codify-th codify-th_static"
+                      >Before and after</span
+                    >
+                  </th>
+                  <th
+                    class="codify-th-cell"
+                    scope="col"
+                    aria-sort={sortMeta.technicianName.ariaSort}
+                  >
+                    <button
+                      class={sortMeta.technicianName.buttonClass}
+                      type="button"
+                      data-field="technicianName"
+                      onclick={handleSort}
+                    >
+                      <span>Technician</span>
+                      <lightning-icon
+                        icon-name={sortMeta.technicianName.icon}
+                        size="xx-small"
+                        class="codify-th__arrow"
+                        alternative-text=""
+                      ></lightning-icon>
+                      <span class="slds-assistive-text"
+                        >{sortMeta.technicianName.assistiveText}</span
+                      >
+                    </button>
+                  </th>
+                  <th
+                    class="codify-th-cell"
+                    scope="col"
+                    aria-sort={sortMeta.createdDate.ariaSort}
+                  >
+                    <button
+                      class={sortMeta.createdDate.buttonClass}
+                      type="button"
+                      data-field="createdDate"
+                      onclick={handleSort}
+                    >
+                      <span>When</span>
+                      <lightning-icon
+                        icon-name={sortMeta.createdDate.icon}
+                        size="xx-small"
+                        class="codify-th__arrow"
+                        alternative-text=""
+                      ></lightning-icon>
+                      <span class="slds-assistive-text"
+                        >{sortMeta.createdDate.assistiveText}</span
+                      >
+                    </button>
+                  </th>
+                  <th
+                    class="codify-th-cell"
+                    scope="col"
+                    aria-sort={sortMeta.requiresHumanReview.ariaSort}
+                  >
+                    <button
+                      class={sortMeta.requiresHumanReview.buttonClass}
+                      type="button"
+                      data-field="requiresHumanReview"
+                      onclick={handleSort}
+                    >
+                      <span>Review</span>
+                      <lightning-icon
+                        icon-name={sortMeta.requiresHumanReview.icon}
+                        size="xx-small"
+                        class="codify-th__arrow"
+                        alternative-text=""
+                      ></lightning-icon>
+                      <span class="slds-assistive-text"
+                        >{sortMeta.requiresHumanReview.assistiveText}</span
+                      >
+                    </button>
+                  </th>
+                  <th class="codify-th-cell codify-th-cell_actions" scope="col">
+                    <span class="slds-assistive-text">Row actions</span>
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <template for:each={pageRows} for:item="row">
+                  <tr key={row.id} class={row.rowClass}>
+                    <td class="codify-td codify-td_toggle">
+                      <lightning-button-icon
+                        icon-name={row.chevronIcon}
+                        variant="bare"
+                        size="small"
+                        alternative-text={row.chevronLabel}
+                        title={row.chevronLabel}
+                        aria-expanded={row.expandedString}
+                        data-id={row.id}
+                        onclick={toggleRow}
+                      ></lightning-button-icon>
+                    </td>
+
+                    <td class="codify-td" data-label="Change #">
+                      <span class="codify-td__ref">{row.name}</span>
+                    </td>
+
+                    <td class="codify-td" data-label="Type">
+                      <c-codify-status-badge
+                        label={row.changeType}
+                        tone={row.typeTone}
+                        icon-name={row.typeIcon}
+                        assistive-prefix="Change type:"
+                        compact
+                      ></c-codify-status-badge>
+                    </td>
+
+                    <td class="codify-td" data-label="Record">
+                      <template lwc:if={row.canOpenRecord}>
+                        <button
+                          class="codify-link"
+                          type="button"
+                          data-id={row.relatedRecordId}
+                          onclick={handleOpenRecord}
+                        >
+                          {row.relatedRecordName}
+                        </button>
+                      </template>
+                      <template lwc:else>
+                        <span>{row.relatedRecordName}</span>
+                      </template>
+                      <span class="codify-td__sub">{row.objectApiName}</span>
+                    </td>
+
+                    <td class="codify-td" data-label="Root cause">
+                      <span class="codify-td__wrap">{row.rootCause}</span>
+                    </td>
+
+                    <td class="codify-td" data-label="Before and after">
+                      <template lwc:if={row.hasDiff}>
+                        <div class="codify-diff">
+                          <template lwc:if={row.hasOldValue}>
+                            <span class="codify-diff__old">{row.oldValue}</span>
+                            <lightning-icon
+                              icon-name="utility:forward"
+                              size="xx-small"
+                              class="codify-diff__arrow"
+                              alternative-text="changed to"
+                            ></lightning-icon>
+                          </template>
+                          <span class="codify-diff__new">{row.newValue}</span>
+                        </div>
+                        <template lwc:if={row.fieldName}>
+                          <span class="codify-td__sub">{row.fieldName}</span>
+                        </template>
+                      </template>
+                      <template lwc:else>
+                        <span class="codify-td__sub">No field changed</span>
+                      </template>
+                    </td>
+
+                    <td class="codify-td" data-label="Technician">
+                      <span class="codify-td__wrap">{row.technicianName}</span>
+                    </td>
+
+                    <td class="codify-td" data-label="When">
+                      <lightning-formatted-date-time
+                        value={row.createdDate}
+                        year="numeric"
+                        month="short"
+                        day="numeric"
+                        hour="2-digit"
+                        minute="2-digit"
+                      ></lightning-formatted-date-time>
+                    </td>
+
+                    <td class="codify-td" data-label="Review">
+                      <template lwc:if={row.needsReview}>
+                        <c-codify-status-badge
+                          label="Needs review"
+                          tone="pending"
+                          assistive-prefix="Status:"
+                          compact
+                        ></c-codify-status-badge>
+                      </template>
+                      <template lwc:else>
+                        <c-codify-status-badge
+                          label="No review needed"
+                          tone="success"
+                          assistive-prefix="Status:"
+                          compact
+                        ></c-codify-status-badge>
+                      </template>
+                    </td>
+
+                    <td class="codify-td codify-td_actions">
+                      <lightning-button-menu
+                        alternative-text={row.actionsLabel}
+                        title={row.actionsLabel}
+                        icon-size="x-small"
+                        menu-alignment="auto"
+                        variant="border-filled"
+                        data-id={row.id}
+                        onselect={handleRowAction}
+                      >
+                        <lightning-menu-item
+                          value="open_record"
+                          label="Open changed record"
+                          disabled={row.recordActionDisabled}
+                        ></lightning-menu-item>
+                        <lightning-menu-item
+                          value="open_recap"
+                          label={row.recapLabel}
+                          disabled={row.recapActionDisabled}
+                        ></lightning-menu-item>
+                      </lightning-button-menu>
+                    </td>
+                  </tr>
+
+                  <!-- Expanded detail: the full values, which the cells clamp. -->
+                  <template lwc:if={row.expanded}>
+                    <tr key={row.detailKey} class="codify-tr codify-tr_detail">
+                      <td class="codify-td codify-td_detail" colspan="10">
+                        <dl class="codify-detail">
+                          <div class="codify-detail__pair">
+                            <dt>Field</dt>
+                            <dd>{row.fieldNameDisplay}</dd>
+                          </div>
+                          <div class="codify-detail__pair">
+                            <dt>Before</dt>
+                            <dd class="codify-detail__value">
+                              {row.oldValueDisplay}
+                            </dd>
+                          </div>
+                          <div class="codify-detail__pair">
+                            <dt>After</dt>
+                            <dd class="codify-detail__value">
+                              {row.newValueDisplay}
+                            </dd>
+                          </div>
+                          <div class="codify-detail__pair">
+                            <dt>Source recap</dt>
+                            <dd>
+                              <template lwc:if={row.canOpenRecap}>
+                                <button
+                                  class="codify-link"
+                                  type="button"
+                                  data-id={row.sourceResolutionLogId}
+                                  onclick={handleOpenRecord}
+                                >
+                                  {row.sourceResolutionLogName}
+                                </button>
+                              </template>
+                              <template lwc:else>
+                                <span class="codify-td__sub"
+                                  >Not linked to a recap</span
+                                >
+                              </template>
+                            </dd>
+                          </div>
+                        </dl>
+                      </td>
+                    </tr>
+                  </template>
+                </template>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paging, and a way to reach beyond the fetched page -->
+          <div class="codify-paging">
+            <p class="codify-paging__note">{fetchNote}</p>
+            <div class="codify-paging__controls">
+              <div class="codify-paging__size">
+                <lightning-combobox
+                  label="Rows per page"
+                  variant="label-hidden"
+                  value={pageSize}
+                  options={pageSizeOptions}
+                  onchange={handlePageSize}
+                ></lightning-combobox>
+              </div>
+              <span class="codify-paging__label" aria-live="polite"
+                >{pageLabel}</span
+              >
+              <lightning-button-icon
+                icon-name="utility:chevronleft"
+                variant="border-filled"
+                alternative-text="Previous page"
+                title="Previous page"
+                disabled={isFirstPage}
+                onclick={handlePrevious}
+              ></lightning-button-icon>
+              <lightning-button-icon
+                icon-name="utility:chevronright"
+                variant="border-filled"
+                alternative-text="Next page"
+                title="Next page"
+                disabled={isLastPage}
+                onclick={handleNext}
+              ></lightning-button-icon>
+
+              <template lwc:if={canFetchMore}>
+                <div class="codify-action">
+                  <lightning-button
+                    variant="neutral"
+                    label={fetchMoreLabel}
+                    icon-name="utility:down"
+                    disabled={isFetchingMore}
+                    onclick={handleFetchMore}
+                  ></lightning-button>
+                  <template lwc:if={isFetchingMore}>
+                    <span class="codify-action__spinner">
+                      <lightning-spinner
+                        size="x-small"
+                        variant="brand"
+                        alternative-text="Loading more records"
+                      ></lightning-spinner>
+                    </span>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </div>
+        </template>
+
+        <template lwc:else>
+          <c-codify-empty-state
+            icon-name="utility:record_lookup"
+            title={emptyTitle}
+            message={emptyMessage}
+            action-label={emptyActionLabel}
+            onaction={handleReset}
+          ></c-codify-empty-state>
+        </template>
+      </div>
+    </section>
+  </div>
 </template>

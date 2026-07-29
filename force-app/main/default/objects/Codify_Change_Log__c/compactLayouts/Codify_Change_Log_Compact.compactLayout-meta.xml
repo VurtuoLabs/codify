@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Codify_Change_Log_Compact</fullName>
+    <fields>Name</fields>
+    <fields>Change_Type__c</fields>
+    <fields>Object_API_Name__c</fields>
+    <fields>Related_Record_Name__c</fields>
+    <fields>Field_Name__c</fields>
+    <fields>Requires_Human_Review__c</fields>
+    <fields>Created_By_Technician__c</fields>
+    <label>Codify Change Log Compact</label>
+</CompactLayout>

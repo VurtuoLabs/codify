@@ -2,9 +2,9 @@
  * Seeds demo data for the Codify dashboards.
  *
  * Deliberately does NOT insert rows into the audit objects directly. It drives
- * the real invocables with realistic recaps, so everything downstream — the
+ * the real invocables with realistic recaps, so everything downstream - the
  * cached extraction, the change-log rows, the confidence scores, which fixes
- * were judged article-worthy — is produced by Codify rather than fabricated.
+ * were judged article-worthy - is produced by Codify rather than fabricated.
  * That means the dashboards show the system's actual behaviour, and it doubles
  * as an end-to-end exercise of the whole pipeline.
  *
@@ -36,7 +36,7 @@ insert accounts;
 // subject ||| recap. Written so the classifier has genuine corroboration to
 // work with, except where the point is that it does not.
 List<String> seeds = new List<String>{
-  // — Confident, with steps: these should tag AND warrant an article —
+  // - Confident, with steps: these should tag AND warrant an article - 
   'Controller drops offline every morning|||Customer reported the controller was showing an offline error every morning. Turns out the firmware was out of date and the old version drops the connection after a reboot. First I flashed the firmware to 4.2.1, then I reset the controller and verified it stayed online for a full hour. Make sure you power cycle after flashing or the change does not take.',
   'Readings out of range at Site 12|||Site called in because the readings were wrong. The unit was misconfigured after the last service visit, the threshold parameter had been set to the wrong value. I corrected the setting, saved the configuration and confirmed the readings came back into range. Always re-check that parameter after any service work.',
   'Panel dropping connection intermittently|||Panel kept dropping offline through the day. Traced it to the network. The wifi signal at that end of the building is weak and the router had no reserved address, so the dns lookup failed each time it tried to reconnect. I moved it onto ethernet and restored connectivity. Verify it holds for ten minutes before leaving site.',
@@ -50,11 +50,11 @@ List<String> seeds = new List<String>{
   'Second controller offline at Harbourside|||Same story as the unit last week. The firmware was out of date and had never been updated since commissioning, an old version with the known connection bug. I flashed it to the current release and power cycled, then confirmed it held for an hour.',
   'Flow parameter wrong after commissioning|||Another one set up wrong at commissioning. The flow parameter had the wrong value and the configuration had never been checked against the spec. I corrected the setting and verified the output against the reference meter.',
   'Intermittent dropouts at loading bay|||Dropouts at the loading bay all week. The network switch there is on a different vlan and the firewall was blocking the return path, so connectivity kept failing. I corrected the routing and reconnected. Confirmed stable for twenty minutes.',
-  // — Confident cause, but no reusable procedure: should tag, no article —
+  // - Confident cause, but no reusable procedure: should tag, no article - 
   'Main board burnt out|||Dead unit on arrival, the main board had burnt out and you could smell it. I replaced the whole assembly and confirmed it came back up on site.',
   'Drive belt worn through|||Routine callout. The drive belt was badly worn and the bearing had degraded past its life. Swapped both and the vibration went away.',
   'Firmware behind on spare unit|||The firmware was out of date on this one, that was the whole problem, an old version issue.',
-  // — Deliberately thin: these SHOULD fail to classify and route to a human —
+  // - Deliberately thin: these SHOULD fail to classify and route to a human - 
   'Intermittent fault, cause unclear|||Had a look at the unit on site and it seemed like a network thing but honestly I am not certain what it was.',
   'Unit down overnight, unclear why|||Not sure if this was a power fault or something to do with the temperature in the room.',
   'Resolved on site|||Sorted it on site, back up and running now.',

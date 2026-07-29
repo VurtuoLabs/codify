@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <isExposed>false</isExposed>
+    <masterLabel>Codify Skeleton Loader</masterLabel>
+    <description
+  >Shared skeleton placeholder: lines, table rows, KPI card and arbitrary blocks, sized to the content they stand in for so nothing shifts when data arrives.</description>
+</LightningComponentBundle>

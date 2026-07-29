@@ -1,0 +1,38 @@
+<template>
+  <div class={containerClass}>
+    <span class="codify-empty__mark">
+      <lightning-icon
+        icon-name={iconName}
+        size="small"
+        alternative-text=""
+        class="codify-empty__icon"
+      ></lightning-icon>
+    </span>
+
+    <p class="codify-empty__title">{title}</p>
+
+    <template lwc:if={message}>
+      <p class="codify-empty__message">{message}</p>
+    </template>
+
+    <template lwc:if={hasActions}>
+      <div class="codify-empty__actions">
+        <template lwc:if={actionLabel}>
+          <lightning-button
+            variant="brand"
+            label={actionLabel}
+            icon-name={actionIcon}
+            onclick={handleAction}
+          ></lightning-button>
+        </template>
+        <template lwc:if={secondaryActionLabel}>
+          <lightning-button
+            variant="neutral"
+            label={secondaryActionLabel}
+            onclick={handleSecondaryAction}
+          ></lightning-button>
+        </template>
+      </div>
+    </template>
+  </div>
+</template>

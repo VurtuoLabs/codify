@@ -1,0 +1,219 @@
+/*
+  KPI card. The tone shows as a hairline rule down the left edge and in the
+  figure's colour - never as a filled panel, which would make a grid of tiles
+  read as a set of warnings.
+*/
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.codify-kpi {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--codify-surface, #fff);
+  border: 1px solid var(--codify-line, #e5e5e5);
+  border-left: 0.1875rem solid var(--codify-accent, #0f766e);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  box-shadow: var(--codify-shadow, 0 1px 2px rgba(28, 26, 23, 0.06));
+}
+
+.codify-kpi__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  flex: 1;
+  padding: var(--slds-g-spacing-4, 1rem);
+}
+
+/* Content fades in once, rather than snapping in from the skeleton. */
+.codify-kpi__body_in {
+  animation: codify-fade-in 200ms cubic-bezier(0.3, 0, 0.2, 1) both;
+}
+
+@keyframes codify-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.1875rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.codify-kpi__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.codify-kpi__label {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--codify-muted, #6f6a62);
+}
+
+.codify-kpi__icon {
+  --slds-c-icon-color-foreground: var(--codify-muted, #6f6a62);
+  --slds-c-icon-color-foreground-default: var(--codify-muted, #6f6a62);
+  flex: none;
+}
+
+.codify-kpi__icon_error {
+  --slds-c-icon-color-foreground: var(--codify-critical, #b42318);
+  --slds-c-icon-color-foreground-default: var(--codify-critical, #b42318);
+}
+
+.codify-kpi__value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--codify-ink, #1c1a17);
+}
+
+.codify-kpi__value_unavailable {
+  color: var(--codify-muted, #6f6a62);
+}
+
+.codify-kpi__unit {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--codify-muted, #6f6a62);
+}
+
+.codify-kpi__trend,
+.codify-kpi__support,
+.codify-kpi__error {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--codify-muted, #6f6a62);
+}
+
+.codify-kpi__trend {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+.codify-kpi__trend-icon {
+  --slds-c-icon-color-foreground: currentColor;
+  --slds-c-icon-color-foreground-default: currentColor;
+}
+
+.codify-kpi__error {
+  color: var(--codify-critical, #b42318);
+}
+
+.codify-kpi__support {
+  max-width: 40ch;
+}
+
+/* Slotted footer content (links, badges) sits on a common baseline across a row. */
+.codify-kpi__foot {
+  margin-top: auto;
+}
+
+.codify-kpi__foot:empty {
+  display: none;
+}
+
+/* Proportion bar, themed through the base component's styling hooks so it stays
+   a lightning-progress-bar rather than a hand-rolled div. */
+.codify-kpi__progress {
+  padding-top: 0.125rem;
+}
+
+.codify-kpi__bar {
+  --slds-c-progress-bar-color-background: var(--codify-sunken, #f3f3f3);
+  --slds-c-progress-bar-bar-color-background: var(--codify-accent, #0f766e);
+  --sds-c-progress-bar-color-background: var(--codify-sunken, #f3f3f3);
+  --sds-c-progress-bar-bar-color-background: var(--codify-accent, #0f766e);
+  display: block;
+}
+
+/* ── Tones ───────────────────────────────────────────────────────────────── */
+.codify-kpi_good {
+  border-left-color: var(--codify-good, #047857);
+}
+.codify-kpi_good .codify-kpi__bar {
+  --slds-c-progress-bar-bar-color-background: var(--codify-good, #047857);
+  --sds-c-progress-bar-bar-color-background: var(--codify-good, #047857);
+}
+
+.codify-kpi_attention {
+  border-left-color: var(--codify-pending, #4b5563);
+}
+.codify-kpi_attention .codify-kpi__value {
+  color: var(--codify-pending, #4b5563);
+}
+.codify-kpi_attention .codify-kpi__bar {
+  --slds-c-progress-bar-bar-color-background: var(--codify-pending, #4b5563);
+  --sds-c-progress-bar-bar-color-background: var(--codify-pending, #4b5563);
+}
+
+.codify-kpi_critical {
+  border-left-color: var(--codify-critical, #b42318);
+}
+.codify-kpi_critical .codify-kpi__value {
+  color: var(--codify-critical, #b42318);
+}
+.codify-kpi_critical .codify-kpi__bar {
+  --slds-c-progress-bar-bar-color-background: var(--codify-critical, #b42318);
+  --sds-c-progress-bar-bar-color-background: var(--codify-critical, #b42318);
+}
+
+.codify-kpi_neutral {
+  border-left-color: var(--codify-line-strong, #c9c9c9);
+}
+
+/* ── Hero: the one figure a reader should see first ──────────────────────── */
+.codify-kpi_hero {
+  border-left-width: 0.25rem;
+  background: var(--codify-surface, #fff);
+}
+
+.codify-kpi_hero .codify-kpi__body {
+  padding: var(--slds-g-spacing-5, 1.5rem);
+}
+
+.codify-kpi_hero .codify-kpi__value {
+  font-size: 3.25rem;
+}
+
+.codify-kpi_hero .codify-kpi__label {
+  font-size: 0.75rem;
+  color: var(--codify-ink-soft, #46423c);
+}
+
+.codify-kpi_hero .codify-kpi__support {
+  font-size: 0.8125rem;
+  max-width: 44ch;
+  color: var(--codify-ink-soft, #46423c);
+}
+
+@media (max-width: 30em) {
+  .codify-kpi_hero .codify-kpi__value {
+    font-size: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .codify-kpi__body_in {
+    animation: none;
+  }
+}

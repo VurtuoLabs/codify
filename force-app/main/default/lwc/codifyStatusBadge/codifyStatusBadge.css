@@ -1,0 +1,67 @@
+/*
+  Status pill. Tone colours are read from the page-level Codify tokens when the
+  badge is used inside one of the app's surfaces, and fall back to the same
+  literals so the pill is still correct if it is dropped somewhere on its own.
+*/
+
+.codify-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--slds-g-spacing-1, 0.25rem);
+  padding: 0.1875rem var(--slds-g-spacing-2, 0.5rem);
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.codify-badge_compact {
+  padding: 0.0625rem var(--slds-g-spacing-1, 0.25rem);
+  font-size: 0.625rem;
+}
+
+.codify-badge__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* currentColor drives both the border and the icon, so a tone is one rule. */
+.codify-badge__icon {
+  --slds-c-icon-color-foreground: currentColor;
+  --slds-c-icon-color-foreground-default: currentColor;
+  flex: none;
+}
+
+.codify-badge_neutral {
+  color: var(--codify-muted, #6f6a62);
+  background: var(--codify-sunken, #f3f3f3);
+}
+
+.codify-badge_accent {
+  color: var(--codify-accent-ink, #134e4a);
+  background: var(--codify-accent-tint, #e6f4f1);
+}
+
+.codify-badge_success {
+  color: var(--codify-good, #047857);
+  background: var(--codify-good-tint, #e7f3ec);
+}
+
+.codify-badge_pending {
+  color: var(--codify-pending, #4b5563);
+  background: var(--codify-pending-tint, #eeeeec);
+}
+
+.codify-badge_critical {
+  color: var(--codify-critical, #b42318);
+  background: var(--codify-critical-tint, #fbeceb);
+}
+
+.codify-badge_info {
+  color: var(--codify-accent-strong, #115e59);
+  background: var(--codify-accent-tint, #e6f4f1);
+}

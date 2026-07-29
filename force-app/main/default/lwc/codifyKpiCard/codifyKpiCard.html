@@ -1,0 +1,84 @@
+<template>
+  <div class={cardClass}>
+    <!-- Loading, error and loaded all share the same box, so nothing moves
+         when the data lands. -->
+    <template lwc:if={loading}>
+      <div class="codify-kpi__body">
+        <c-codify-skeleton-loader
+          variant="kpi"
+          assistive-text={loadingAssistiveText}
+        ></c-codify-skeleton-loader>
+      </div>
+    </template>
+
+    <template lwc:elseif={errorMessage}>
+      <div class="codify-kpi__body codify-kpi__body_in" role="alert">
+        <div class="codify-kpi__head">
+          <p class="codify-kpi__label">{label}</p>
+          <lightning-icon
+            icon-name="utility:error"
+            size="x-small"
+            alternative-text="Error"
+            class="codify-kpi__icon codify-kpi__icon_error"
+          ></lightning-icon>
+        </div>
+        <p class="codify-kpi__value codify-kpi__value_unavailable"> - </p>
+        <p class="codify-kpi__error">{errorMessage}</p>
+      </div>
+    </template>
+
+    <template lwc:else>
+      <div class="codify-kpi__body codify-kpi__body_in">
+        <div class="codify-kpi__head">
+          <p class="codify-kpi__label">{label}</p>
+          <template lwc:if={iconName}>
+            <lightning-icon
+              icon-name={iconName}
+              size="x-small"
+              alternative-text=""
+              class="codify-kpi__icon"
+            ></lightning-icon>
+          </template>
+        </div>
+
+        <p class={valueClass}>
+          <span>{displayValue}</span>
+          <template lwc:if={unit}>
+            <span class="codify-kpi__unit">{unit}</span>
+          </template>
+        </p>
+
+        <template lwc:if={hasTrend}>
+          <p class="codify-kpi__trend">
+            <lightning-icon
+              icon-name={trendIcon}
+              size="xx-small"
+              alternative-text=""
+              class="codify-kpi__trend-icon"
+            ></lightning-icon>
+            <span>{trendLabel}</span>
+          </p>
+        </template>
+
+        <template lwc:if={showProgress}>
+          <div class="codify-kpi__progress">
+            <lightning-progress-bar
+              value={clampedProgress}
+              size="small"
+              class="codify-kpi__bar"
+            ></lightning-progress-bar>
+            <span class="slds-assistive-text">{progressAssistiveText}</span>
+          </div>
+        </template>
+
+        <template lwc:if={resolvedSupportingText}>
+          <p class="codify-kpi__support">{resolvedSupportingText}</p>
+        </template>
+
+        <div class="codify-kpi__foot">
+          <slot></slot>
+        </div>
+      </div>
+    </template>
+  </div>
+</template>

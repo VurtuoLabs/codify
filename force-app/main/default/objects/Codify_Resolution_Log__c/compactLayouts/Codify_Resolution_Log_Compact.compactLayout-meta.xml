@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Codify_Resolution_Log_Compact</fullName>
+    <fields>Name</fields>
+    <fields>Case__c</fields>
+    <fields>Root_Cause_Category__c</fields>
+    <fields>Root_Cause_Confidence__c</fields>
+    <fields>Low_Confidence__c</fields>
+    <fields>Article_Drafted__c</fields>
+    <fields>Logged_By_Technician__c</fields>
+    <label>Codify Resolution Log Compact</label>
+</CompactLayout>

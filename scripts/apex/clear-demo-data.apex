@@ -2,7 +2,7 @@
  * Removes everything seed-demo-data.apex and seed-publish-articles.apex created,
  * so a demo org can be reset without hunting through records by hand.
  *
- * Order matters. Knowledge articles cannot be deleted with plain DML — drafts go
+ * Order matters. Knowledge articles cannot be deleted with plain DML - drafts go
  * through the publishing service, and a published article has to be unpublished
  * (returned to draft) before it can be removed at all. The audit rows go before
  * the resolution logs they point at, and the Cases go last because the logs look

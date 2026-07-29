@@ -4,7 +4,7 @@
     <isExposed>true</isExposed>
     <masterLabel>Codify Root Cause Trends</masterLabel>
     <description
-  >Which root causes recur most and whether Knowledge has caught up with them, tied back to Related Case Sweep activity. Flags recurring causes with no article behind them.</description>
+  >Which root causes recur most and whether Knowledge has caught up with them, as a ranked list with searchable, sortable coverage status. Counts and flags recurring causes with no article behind them.</description>
     <targets>
         <target>lightning__AppPage</target>
         <target>lightning__HomePage</target>

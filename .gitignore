@@ -17,3 +17,5 @@ node_modules/
 .retrieve-mdapi/
 .retrieve-tmp/
 .tmpret/
+
+.claude/

@@ -1,0 +1,51 @@
+<template>
+  <div class="codify-sh">
+    <div class="codify-sh__main">
+      <template lwc:if={collapsible}>
+        <button
+          class="codify-sh__toggle"
+          type="button"
+          aria-expanded={expandedString}
+          onclick={handleToggle}
+        >
+          <lightning-icon
+            icon-name="utility:chevronright"
+            size="xx-small"
+            class={chevronClass}
+            alternative-text=""
+          ></lightning-icon>
+          <span class="slds-assistive-text">{toggleAssistiveText}</span>
+        </button>
+      </template>
+
+      <div class="codify-sh__copy">
+        <template lwc:if={eyebrow}>
+          <p class="codify-sh__eyebrow">{eyebrow}</p>
+        </template>
+
+        <h2 class="codify-sh__heading">
+          <template lwc:if={iconName}>
+            <lightning-icon
+              icon-name={iconName}
+              size="x-small"
+              alternative-text=""
+              class="codify-sh__icon"
+            ></lightning-icon>
+          </template>
+          <span>{title}</span>
+          <template lwc:if={count}>
+            <span class="codify-sh__count">{count}</span>
+          </template>
+        </h2>
+
+        <template lwc:if={description}>
+          <p class="codify-sh__description">{description}</p>
+        </template>
+      </div>
+    </div>
+
+    <div class="codify-sh__actions">
+      <slot name="actions"></slot>
+    </div>
+  </div>
+</template>

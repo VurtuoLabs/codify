@@ -3,7 +3,7 @@
  *
  * Split from seed-demo-data.apex for two reasons. Practically, the first pass is
  * close to the DML limit for one anonymous execution. Conceptually, publishing
- * is a *human* decision that Codify deliberately cannot make — so it belongs in
+ * is a *human* decision that Codify deliberately cannot make - so it belongs in
  * a separate script that represents a Knowledge owner working the review queue,
  * not in the one that represents the agent.
  *

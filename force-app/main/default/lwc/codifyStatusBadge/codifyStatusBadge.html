@@ -1,0 +1,11 @@
+<template>
+  <span class={badgeClass} title={tooltipText}>
+    <lightning-icon
+      icon-name={resolvedIcon}
+      size="xx-small"
+      class="codify-badge__icon"
+    ></lightning-icon>
+    <span class="slds-assistive-text">{assistivePrefix}</span>
+    <span class="codify-badge__label">{label}</span>
+  </span>
+</template>

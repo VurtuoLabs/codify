@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <isExposed>false</isExposed>
+    <masterLabel>Codify Display Helpers</masterLabel>
+    <description
+  >JS-only shared module: change-type presentation, change descriptions, and one place that translates Apex errors into plain language while keeping the raw text for diagnostics.</description>
+</LightningComponentBundle>

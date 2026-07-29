@@ -256,7 +256,7 @@ public with sharing class Codify_DraftArticleInvocable {
       String.isNotBlank(subject) &&
       String.isNotBlank(log.Root_Cause_Category__c)
     ) {
-      return subject.trim() + ' — ' + log.Root_Cause_Category__c;
+      return subject.trim() + ' - ' + log.Root_Cause_Category__c;
     }
     if (String.isNotBlank(subject)) {
       return subject.trim();
