@@ -261,6 +261,17 @@ Four bugs that only a real deploy surfaced, all fixed here, each recorded becaus
 3. **Agent Script needs a full locale.** `default_locale: "en"` is rejected by the compiler with a 422 that names no line or field; it must be `"en_US"`.
 4. **Agent action outputs must match their Flow variable names exactly.** A Flow variable cannot be both an input and an output, so `Codify_Draft_Knowledge_Article` renames its output to `draftedArticleTitle`, and the agent must declare that name. The mismatch only surfaces on save, as a Generative AI Function Definition error.
 
+## Screenshots
+
+Captured from a live org at a 1200px viewport.
+
+| | |
+|---|---|
+| ![Codify Home](docs/screenshots/01-home.png) | ![Change Log](docs/screenshots/02-change-log.png) |
+| **Codify Home.** The review desk. What is waiting on a person leads the page, because nothing else stalls without one. | **Change Log.** Every write, with before and after rendered as a diff. |
+| ![Pending Article Reviews](docs/screenshots/03-article-reviews.png) | ![Root Cause Trends](docs/screenshots/04-root-cause-trends.png) |
+| **Pending Article Reviews.** The draft set as a manuscript, reviewer controls off the paper. | **Root Cause Trends.** Ranked causes with small multiples on shared scales. |
+
 ## License
 
 See [LICENSE](LICENSE).
