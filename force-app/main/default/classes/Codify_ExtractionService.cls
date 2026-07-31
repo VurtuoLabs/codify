@@ -191,6 +191,7 @@ public with sharing class Codify_ExtractionService {
         SELECT Extraction_JSON__c, Resolution_Recap__c
         FROM Codify_Resolution_Log__c
         WHERE Id = :resolutionLogId
+        WITH USER_MODE
         LIMIT 1
       ];
       if (!logs.isEmpty()) {
@@ -290,6 +291,7 @@ public with sharing class Codify_ExtractionService {
         Is_Active__c
       FROM Codify_Root_Cause_Taxonomy__mdt
       WHERE Is_Active__c = TRUE
+      WITH USER_MODE
       ORDER BY Sort_Order__c ASC NULLS LAST
     ];
   }

@@ -142,6 +142,7 @@ public with sharing class Codify_TagRootCauseInvocable {
       SELECT Id, CaseNumber, Codify_Root_Cause__c, Codify_Root_Cause_Key__c
       FROM Case
       WHERE Id = :caseId
+      WITH USER_MODE
       LIMIT 1
     ];
     if (cases.isEmpty()) {

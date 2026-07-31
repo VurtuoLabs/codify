@@ -83,6 +83,7 @@ public with sharing class Codify_EscalateForReviewInvocable {
           Extraction_JSON__c
         FROM Codify_Resolution_Log__c
         WHERE Id = :logId
+        WITH USER_MODE
         LIMIT 1
       ];
       if (!logs.isEmpty()) {
@@ -101,6 +102,7 @@ public with sharing class Codify_EscalateForReviewInvocable {
         SELECT Id, CaseNumber, OwnerId
         FROM Case
         WHERE Id = :caseId
+        WITH USER_MODE
         LIMIT 1
       ];
       if (!cases.isEmpty()) {

@@ -113,7 +113,10 @@ public with sharing class Codify_ChangeLogConsoleController {
 
     List<ChangeRow> rows = new List<ChangeRow>();
     for (
-      Codify_Change_Log__c c : (List<Codify_Change_Log__c>) Database.query(soql)
+      Codify_Change_Log__c c : (List<Codify_Change_Log__c>) Database.query(
+        soql,
+        AccessLevel.USER_MODE
+      )
     ) {
       rows.add(toRow(c));
     }
@@ -146,6 +149,7 @@ public with sharing class Codify_ChangeLogConsoleController {
         CreatedDate
       FROM Codify_Change_Log__c
       WHERE Related_Record_Id__c = :recordId
+      WITH USER_MODE
       ORDER BY CreatedDate DESC
       LIMIT 200
     ]) {
@@ -163,6 +167,7 @@ public with sharing class Codify_ChangeLogConsoleController {
       SELECT COUNT()
       FROM Codify_Change_Log__c
       WHERE Related_Record_Id__c = :recordId
+      WITH USER_MODE
     ];
   }
 
@@ -179,6 +184,7 @@ public with sharing class Codify_ChangeLogConsoleController {
         Source_Resolution_Log__r.Root_Cause_Category__c
       FROM Codify_Change_Log__c
       WHERE CreatedDate = LAST_N_DAYS:180
+      WITH USER_MODE
       LIMIT 5000
     ]) {
       if (

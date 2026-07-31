@@ -106,6 +106,7 @@ public with sharing class Codify_DraftArticleInvocable {
         Extraction_JSON__c
       FROM Codify_Resolution_Log__c
       WHERE Id = :logId
+      WITH USER_MODE
       LIMIT 1
     ];
     if (logs.isEmpty()) {

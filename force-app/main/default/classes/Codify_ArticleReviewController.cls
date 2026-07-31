@@ -71,6 +71,7 @@ public with sharing class Codify_ArticleReviewController {
         WHERE
           Codify_Generated__c = TRUE
           AND PublishStatus = :Codify_Constants.KNOWLEDGE_DRAFT_STATUS
+        WITH USER_MODE
         ORDER BY LastModifiedDate DESC
         LIMIT :lim
       ];
@@ -99,7 +100,7 @@ public with sharing class Codify_ArticleReviewController {
     Map<Id, Case> cases = caseIds.isEmpty()
       ? new Map<Id, Case>()
       : new Map<Id, Case>(
-          [SELECT Id, CaseNumber FROM Case WHERE Id IN :caseIds]
+          [SELECT Id, CaseNumber FROM Case WHERE Id IN :caseIds WITH USER_MODE]
         );
     Map<Id, Codify_Resolution_Log__c> logs = logIds.isEmpty()
       ? new Map<Id, Codify_Resolution_Log__c>()
@@ -108,6 +109,7 @@ public with sharing class Codify_ArticleReviewController {
             SELECT Id, Name, Logged_By_Technician__r.Name
             FROM Codify_Resolution_Log__c
             WHERE Id IN :logIds
+            WITH USER_MODE
           ]
         );
 
@@ -147,6 +149,7 @@ public with sharing class Codify_ArticleReviewController {
         WHERE
           Codify_Generated__c = TRUE
           AND PublishStatus = :Codify_Constants.KNOWLEDGE_DRAFT_STATUS
+        WITH USER_MODE
       ];
     } catch (Exception e) {
       System.debug(
@@ -184,6 +187,7 @@ public with sharing class Codify_ArticleReviewController {
         Codify_Source_Resolution_Log__c
       FROM Knowledge__kav
       WHERE Id = :aId
+      WITH USER_MODE
       LIMIT 1
     ];
     if (existing.isEmpty()) {
@@ -241,6 +245,7 @@ public with sharing class Codify_ArticleReviewController {
         Codify_Source_Resolution_Log__c
       FROM Knowledge__kav
       WHERE Id = :aId
+      WITH USER_MODE
       LIMIT 1
     ];
     if (existing.isEmpty()) {

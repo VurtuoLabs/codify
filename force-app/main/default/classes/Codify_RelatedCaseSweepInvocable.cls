@@ -98,6 +98,7 @@ public with sharing class Codify_RelatedCaseSweepInvocable {
         Low_Confidence__c
       FROM Codify_Resolution_Log__c
       WHERE Id = :logId
+      WITH USER_MODE
       LIMIT 1
     ];
     if (logs.isEmpty()) {
@@ -146,6 +147,7 @@ public with sharing class Codify_RelatedCaseSweepInvocable {
         AND Codify_Root_Cause_Key__c IN :keys
         AND Id != :excludeCaseId
         AND Codify_Suggested_Fix_Source__c = NULL
+      WITH USER_MODE
       ORDER BY CreatedDate ASC
       LIMIT :maxCases
     ];

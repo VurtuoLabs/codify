@@ -68,12 +68,18 @@ public with sharing class Codify_HomeDashboardController {
       SELECT COUNT()
       FROM Codify_Resolution_Log__c
       WHERE CreatedDate = THIS_WEEK
+      WITH USER_MODE
     ];
-    s.resolutionsAllTime = [SELECT COUNT() FROM Codify_Resolution_Log__c];
+    s.resolutionsAllTime = [
+      SELECT COUNT()
+      FROM Codify_Resolution_Log__c
+      WITH USER_MODE
+    ];
     s.articlesDrafted = [
       SELECT COUNT()
       FROM Codify_Resolution_Log__c
       WHERE Article_Drafted__c = TRUE
+      WITH USER_MODE
     ];
     s.escalations = [
       SELECT COUNT()
@@ -81,6 +87,7 @@ public with sharing class Codify_HomeDashboardController {
       WHERE
         Change_Type__c = :Codify_Constants.CHANGE_ESCALATED_FOR_REVIEW
         AND CreatedDate = THIS_WEEK
+      WITH USER_MODE
     ];
     s.casesFlagged = [
       SELECT COUNT()
@@ -88,6 +95,7 @@ public with sharing class Codify_HomeDashboardController {
       WHERE
         Change_Type__c = :Codify_Constants.CHANGE_RELATED_CASE_FLAGGED
         AND CreatedDate = THIS_WEEK
+      WITH USER_MODE
     ];
     s.articlesPending = countDrafts(Codify_Constants.KNOWLEDGE_DRAFT_STATUS);
     s.articlesPublished = countDrafts('Online');
@@ -97,6 +105,7 @@ public with sharing class Codify_HomeDashboardController {
       SELECT COUNT()
       FROM Codify_Resolution_Log__c
       WHERE Root_Cause_Category__c != NULL
+      WITH USER_MODE
     ];
     s.resolutionsUntagged = s.resolutionsAllTime - s.resolutionsTagged;
 
@@ -104,6 +113,7 @@ public with sharing class Codify_HomeDashboardController {
       SELECT Root_Cause_Category__c cause, COUNT(Id) cnt
       FROM Codify_Resolution_Log__c
       WHERE Root_Cause_Category__c != NULL AND CreatedDate = LAST_N_DAYS:90
+      WITH USER_MODE
       GROUP BY Root_Cause_Category__c
       ORDER BY COUNT(Id) DESC
       LIMIT 8
@@ -117,6 +127,7 @@ public with sharing class Codify_HomeDashboardController {
       SELECT Logged_By_Technician__r.Name techName, COUNT(Id) cnt
       FROM Codify_Resolution_Log__c
       WHERE CreatedDate = THIS_WEEK AND Logged_By_Technician__c != NULL
+      WITH USER_MODE
       GROUP BY Logged_By_Technician__r.Name
       ORDER BY COUNT(Id) DESC
       LIMIT 5
@@ -130,6 +141,7 @@ public with sharing class Codify_HomeDashboardController {
       SELECT Change_Type__c ct, COUNT(Id) cnt
       FROM Codify_Change_Log__c
       WHERE CreatedDate = THIS_WEEK AND Change_Type__c != NULL
+      WITH USER_MODE
       GROUP BY Change_Type__c
       ORDER BY COUNT(Id) DESC
     ]) {
@@ -145,6 +157,7 @@ public with sharing class Codify_HomeDashboardController {
       SELECT DAY_ONLY(CreatedDate) d, COUNT(Id) cnt
       FROM Codify_Resolution_Log__c
       WHERE CreatedDate = LAST_N_DAYS:7
+      WITH USER_MODE
       GROUP BY DAY_ONLY(CreatedDate)
     ]) {
       counts.put((Date) ar.get('d'), (Integer) ar.get('cnt'));
@@ -178,6 +191,7 @@ public with sharing class Codify_HomeDashboardController {
         CreatedDate
       FROM Codify_Resolution_Log__c
       WHERE Root_Cause_Category__c != NULL AND CreatedDate >= :since
+      WITH USER_MODE
       ORDER BY CreatedDate DESC
       LIMIT 5000
     ]) {
@@ -231,6 +245,7 @@ public with sharing class Codify_HomeDashboardController {
         SELECT COUNT()
         FROM Knowledge__kav
         WHERE Codify_Generated__c = TRUE AND PublishStatus = :publishStatus
+        WITH USER_MODE
       ];
     } catch (Exception e) {
       System.debug(

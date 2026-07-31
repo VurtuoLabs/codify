@@ -135,6 +135,7 @@ public with sharing class Codify_LogResolutionInvocable {
           Codify_Root_Cause_Key__c
         FROM Case
         WHERE Id = :caseId
+        WITH USER_MODE
         LIMIT 1
       ];
       if (!cases.isEmpty()) {
